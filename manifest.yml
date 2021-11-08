@@ -4,7 +4,20 @@ description: Statemine Indexer
 typegen:
   outDir: src/types
   events:
+    - assets.Created
+    - assets.Issued
+    - assets.Transferred
+    - assets.Burned
+    - assets.TeamChanged
+    - assets.OwnerChanged
+    - assets.Frozen
+    - assets.Thawed
+    - assets.AssetFrozen
+    - assets.AssetThawed
+    - assets.Destroyed
+    - assets.TransferredApproved
     - balances.Transfer
+
 
 mappings:
   mappingsModule: lib/mappings
