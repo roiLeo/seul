@@ -16,8 +16,8 @@ export class AssetBalance {
    *  AccountId-AssetId
    */
   @Index_()
-  @ManyToOne_(() => Account, {nullable: true})
-  account!: Account | undefined | null
+  @ManyToOne_(() => Account, {nullable: false})
+  account!: Account
 
   @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
   balance!: bigint

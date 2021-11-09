@@ -21,7 +21,7 @@ type Asset @entity {
 
 type AssetBalance @entity {
     id: ID! " AccountId-AssetId"
-    account: Account
+    account: Account!
     balance: BigInt!
     asset: Asset!
 }
