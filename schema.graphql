@@ -1,14 +1,48 @@
-type Account @entity {
-    "Account address"
-    id: ID!
-    wallet: String!
-    balance: BigInt!
-    historicalBalances: [HistoricalBalance!] @derivedFrom(field: "account")
+enum AssetStatus {
+  ACTIVE
+  FREEZED
+  DESTROYED
 }
 
-type HistoricalBalance @entity {
-    id: ID!
-    account: Account!
-    balance: BigInt!
-    timestamp: DateTime!
+type Asset @entity {
+    id: ID! # Asset Id
+    name: String
+    symbol: String
+    decimal: Int
+    admin: String!
+    issuer: String
+    freezer: String
+    minBalance: BigInt!
+    status: AssetStatus!
+    totalSupply: BigInt! "Total supply of asset in statemine"
+    transfers: [Transfer!] @derivedFrom(field: "asset")
+    balances: [AssetBalance!] @derivedFrom(field: "asset")
 }
+
+type AssetBalance @entity {
+    id: ID! " AccountId-AssetId"
+    account: Account
+    balance: BigInt!
+    asset: Asset!
+}
+
+type Account @entity {
+    id: ID! "Account address"
+    wallet: String! @unique
+    balance: BigInt! #Native KSM balance
+    assets: [AssetBalance!] @derivedFrom(field: "account")
+}
+
+
+type Transfer @entity{
+  id: ID! "event id"
+  amount: String!
+  to: String!
+  from: String!
+  fee: BigInt
+  asset: Asset!
+  extrinisicId: String
+  success: Boolean!
+}
+
+

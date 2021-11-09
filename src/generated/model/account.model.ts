@@ -1,6 +1,6 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
 import * as marshal from "../marshal"
-import {HistoricalBalance} from "./historicalBalance.model"
+import {AssetBalance} from "./assetBalance.model"
 
 @Entity_()
 export class Account {
@@ -8,18 +8,18 @@ export class Account {
     Object.assign(this, props)
   }
 
-  /**
-   * Account address
-   */
   @PrimaryColumn_()
   id!: string
 
+  /**
+   * Account address
+   */
   @Column_("text", {nullable: false})
   wallet!: string
 
   @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
   balance!: bigint
 
-  @OneToMany_(() => HistoricalBalance, e => e.account)
-  historicalBalances!: HistoricalBalance[]
+  @OneToMany_(() => AssetBalance, e => e.account)
+  assets!: AssetBalance[]
 }
