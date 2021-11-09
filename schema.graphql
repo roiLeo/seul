@@ -4,6 +4,12 @@ enum AssetStatus {
   DESTROYED
 }
 
+enum TransferType {
+  REGULAR
+  MINT
+  BURN
+}
+
 type Asset @entity {
     id: ID! # Asset Id
     name: String
@@ -14,7 +20,6 @@ type Asset @entity {
     freezer: String
     minBalance: BigInt!
     status: AssetStatus!
-    totalSupply: BigInt! "Total supply of asset in statemine"
     transfers: [Transfer!] @derivedFrom(field: "asset")
     balances: [AssetBalance!] @derivedFrom(field: "asset")
 }
@@ -41,6 +46,7 @@ type Transfer @entity{
   from: String!
   fee: BigInt
   asset: Asset!
+  type: TransferType!
   extrinisicId: String
   success: Boolean!
 }

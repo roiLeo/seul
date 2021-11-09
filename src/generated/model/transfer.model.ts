@@ -1,6 +1,7 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_} from "typeorm"
 import * as marshal from "../marshal"
 import {Asset} from "./asset.model"
+import {TransferType} from "./transferType"
 
 @Entity_()
 export class Transfer {
@@ -29,6 +30,9 @@ export class Transfer {
   @Index_()
   @ManyToOne_(() => Asset, {nullable: false})
   asset!: Asset
+
+  @Column_("varchar", {length: 7, nullable: false})
+  type!: TransferType
 
   @Column_("text", {nullable: true})
   extrinisicId!: string | undefined | null
