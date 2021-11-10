@@ -39,4 +39,13 @@ export class Transfer {
 
   @Column_("bool", {nullable: false})
   success!: boolean
+
+  @Column_("timestamp with time zone", {nullable: false})
+  createdAt!: Date
+
+  @Column_("text", {nullable: false})
+  blockHash!: string
+
+  @Column_("integer", {nullable: false})
+  blockNum!: number
 }

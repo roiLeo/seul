@@ -49,6 +49,9 @@ type Transfer @entity{
   type: TransferType!
   extrinisicId: String
   success: Boolean!
+  createdAt: DateTime!
+  blockHash: String!
+  blockNum: Int!
 }
 
 
