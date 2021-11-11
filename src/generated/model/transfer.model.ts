@@ -15,8 +15,8 @@ export class Transfer {
   /**
    * event id
    */
-  @Column_("text", {nullable: false})
-  amount!: string
+  @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+  amount!: bigint
 
   @Column_("text", {nullable: false})
   to!: string

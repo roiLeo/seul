@@ -1,5 +1,5 @@
 import { EventContext, StoreContext } from '@subsquid/hydra-common'
-import { Account, HistoricalBalance } from '../generated/model'
+import { Account, HistoricalBalance, Transfer, TransferType } from '../generated/model'
 import { Balances } from '../types/index'
 import { getOrCreate } from './helpers/entity-utils'
 
@@ -38,6 +38,21 @@ export async function balancesTransfer({
   hbTo.balance = toAcc.balance;
   hbTo.timestamp = new Date(block.timestamp)
   await store.save(hbTo)
+
+  const transfer = new Transfer()
+  transfer.amount = value.toBigInt()
+  transfer.blockHash = block.hash
+  transfer.blockNum = block.height
+  transfer.extrinisicId = extrinsic?.id
+  transfer.from = from.toString()
+  transfer.to = to.toString()
+  transfer.success = true
+  transfer.id = event.id
+  transfer.type = TransferType.REGULAR
+  transfer.createdAt = new Date(block.timestamp)
+
+  await store.save(transfer)
+  
 }
 
 
