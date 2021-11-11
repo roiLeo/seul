@@ -28,9 +28,12 @@ export class Transfer {
   fee!: bigint | undefined | null
 
   @Index_()
-  @ManyToOne_(() => Asset, {nullable: false})
-  asset!: Asset
+  @ManyToOne_(() => Asset, {nullable: true})
+  asset!: Asset | undefined | null
 
+  /**
+   * If asset is null, then its a regular DOT/KSM transfer
+   */
   @Column_("varchar", {length: 7, nullable: false})
   type!: TransferType
 

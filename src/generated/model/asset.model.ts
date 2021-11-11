@@ -19,6 +19,9 @@ export class Asset {
   @Column_("text", {nullable: true})
   symbol!: string | undefined | null
 
+  @Column_("text", {nullable: true})
+  freezer!: string | undefined | null
+
   @Column_("integer", {nullable: true})
   decimal!: number | undefined | null
 
@@ -27,9 +30,6 @@ export class Asset {
 
   @Column_("text", {nullable: true})
   issuer!: string | undefined | null
-
-  @Column_("text", {nullable: true})
-  freezer!: string | undefined | null
 
   @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
   minBalance!: bigint
@@ -41,5 +41,5 @@ export class Asset {
   transfers!: Transfer[]
 
   @OneToMany_(() => AssetBalance, e => e.asset)
-  balances!: AssetBalance[]
+  assetBalances!: AssetBalance[]
 }
