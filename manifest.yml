@@ -30,6 +30,10 @@ mappings:
       handler: transferFee
     - event: assets.Created
       handler: assetCreated
+    - event: assets.AssetFrozen
+      handler: assetFrozen
+    - event: assets.AssetThawed
+      handler: assetThawed
     - event: assets.OwnerChanged
       handler: assetOwnerChanged
     - event: assets.TeamChanged

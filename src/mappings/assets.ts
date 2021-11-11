@@ -53,6 +53,38 @@ export async function assetTeamChanged({
   await store.save(asset);
 }
 
+export async function assetFrozen({
+  store,
+  event,
+}: EventContext & StoreContext): Promise<void> {
+  const [asset_id] = new Assets.AssetFrozenEvent(event).params;
+  const asset = await get(store, Asset, asset_id.toString());
+  if (!asset) {
+    console.error("No asset found for id", asset_id.toString());
+    process.exit(1);
+  }
+
+  asset.status = AssetStatus.FREEZED;
+
+  await store.save(asset);
+}
+
+export async function assetThawed({
+  store,
+  event,
+}: EventContext & StoreContext): Promise<void> {
+  const [asset_id] = new Assets.AssetThawedEvent(event).params;
+  const asset = await get(store, Asset, asset_id.toString());
+  if (!asset) {
+    console.error("No asset found for id", asset_id.toString());
+    process.exit(1);
+  }
+
+  asset.status = AssetStatus.ACTIVE;
+
+  await store.save(asset);
+}
+
 export async function assetMetadata({
   store,
   event,
