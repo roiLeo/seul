@@ -19,6 +19,40 @@ export async function assetCreated({
   await store.save(asset);
 }
 
+export async function assetOwnerChanged({
+  store,
+  event,
+}: EventContext & StoreContext): Promise<void> {
+  const [asset_id, owner] = new Assets.OwnerChangedEvent(event).params;
+  const asset = await get(store, Asset, asset_id.toString());
+  if (!asset) {
+    console.error("No asset found for id", asset_id.toString());
+    process.exit(1);
+  }
+
+  asset.owner = owner.toString();
+
+  await store.save(asset);
+}
+export async function assetTeamChanged({
+  store,
+  event,
+}: EventContext & StoreContext): Promise<void> {
+  const [asset_id, issuer, admin, freezer] = new Assets.TeamChangedEvent(event)
+    .params;
+  const asset = await get(store, Asset, asset_id.toString());
+  if (!asset) {
+    console.error("No asset found for id", asset_id.toString());
+    process.exit(1);
+  }
+
+  asset.issuer = issuer.toString();
+  asset.admin = admin.toString();
+  asset.freezer = freezer.toString();
+
+  await store.save(asset);
+}
+
 export async function assetMetadata({
   store,
   event,

@@ -18,6 +18,7 @@ type Asset @entity {
   freezer: String
   decimal: Int
   owner: String!
+  admin: String
   issuer: String
   creator: String
   minBalance: BigInt

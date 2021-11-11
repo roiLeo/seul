@@ -24,20 +24,24 @@ typegen:
 mappings:
   mappingsModule: lib/mappings
   eventHandlers:
-    # - event: balances.Transfer
-    #   handler: balancesTransfer
-    # - event: balances.Deposit
-    #   handler: transferFee
+    - event: balances.Transfer
+      handler: balancesTransfer
+    - event: balances.Deposit
+      handler: transferFee
     - event: assets.Created
       handler: assetCreated
+    - event: assets.OwnerChanged
+      handler: assetOwnerChanged
+    - event: assets.TeamChanged
+      handler: assetTeamChanged
     - event: assets.MetadataSet
       handler: assetMetadata
     - event: assets.MetadataCleared
       handler: assetMetadataCleared
     - event: assets.Issued
       handler: assetIssued
-    # - event: assets.Transferred
-    #   handler: assetTransfer
+    - event: assets.Transferred
+      handler: assetTransfer
     - event: assets.TransferredApproved
       handler: assetTransfer
   extrinsicHandlers:

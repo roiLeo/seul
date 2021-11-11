@@ -29,6 +29,9 @@ export class Asset {
   owner!: string
 
   @Column_("text", {nullable: true})
+  admin!: string | undefined | null
+
+  @Column_("text", {nullable: true})
   issuer!: string | undefined | null
 
   @Column_("text", {nullable: true})
