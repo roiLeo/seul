@@ -4,19 +4,19 @@ description: Statemine Indexer
 typegen:
   outDir: src/types
   events:
+    - balances.Transfer
     - assets.Created
     - assets.Issued
     - assets.Transferred
+    - assets.TransferredApproved
+    - assets.Frozen
+    - assets.Thawed
     - assets.Burned
     - assets.TeamChanged
     - assets.OwnerChanged
-    - assets.Frozen
-    - assets.Thawed
     - assets.AssetFrozen
     - assets.AssetThawed
     - assets.Destroyed
-    - assets.TransferredApproved
-    - balances.Transfer
 
 
 mappings:
