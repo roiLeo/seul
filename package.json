@@ -15,7 +15,9 @@
     "processor:start": "hydra-processor run",
     "processor:start-debug": "DEBUG=hydra-processor:mappings-executor hydra-processor run",
     "query-node:start": "node ./lib/generated/server.js",
-    "eslint": "eslint src/"
+    "eslint": "eslint src/",
+    "prettier": "prettier --write .",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@polkadot/types": "^6.5.1",
@@ -35,7 +37,12 @@
     "@typescript-eslint/eslint-plugin": "^5.3.1",
     "@typescript-eslint/parser": "^5.3.1",
     "eslint": "^8.2.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^11.2.6",
     "prettier": "^2.4.1",
     "typescript": "~4.4.2"
+  },
+  "lint-staged": {
+    "*.ts": "eslint --cache --fix && prettier --write"
   }
 }
