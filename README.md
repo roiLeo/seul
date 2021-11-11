@@ -4,8 +4,8 @@ This is a subsquid processor for statemine assets
 
 ## Prerequisites
 
-* Node v14x
-* Docker
+- Node v14x
+- Docker
 
 ## Bootstrap
 
@@ -34,14 +34,14 @@ npm run query-node:start
 
 Hydra tools expect a certain directory layout:
 
-* `src/generated` - model/server definitions created by `codegen`. Do not alter the contents of this directory manually.
-* `src/server-extension` - module with custom `type-graphql` based resolvers
-* `src/types` - data type definitions for chain events and extrinsics created by `typegen`.
-* `src/mappings` - mapping module.
-* `lib` - compiled js files. The structure of this directory must reflect `src`.
-* `.env` - hydra tools are heavily driven by environment variables defined here or supplied by a shell.
+- `src/generated` - model/server definitions created by `codegen`. Do not alter the contents of this directory manually.
+- `src/server-extension` - module with custom `type-graphql` based resolvers
+- `src/types` - data type definitions for chain events and extrinsics created by `typegen`.
+- `src/mappings` - mapping module.
+- `lib` - compiled js files. The structure of this directory must reflect `src`.
+- `.env` - hydra tools are heavily driven by environment variables defined here or supplied by a shell.
 
-If you do not plan to extend GraphQl server you can delete `server-extension` module and then remove 
+If you do not plan to extend GraphQl server you can delete `server-extension` module and then remove
 `type-graphql` and `class-validator` dependencies.
 
 ## Development flow

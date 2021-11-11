@@ -1,10 +1,11 @@
-version: '4.0'
+version: "4.0"
 description: Statemine Indexer
 
 typegen:
   outDir: src/types
   events:
     - balances.Transfer
+    - balances.Deposit
     - assets.Created
     - assets.Issued
     - assets.Transferred
@@ -18,12 +19,13 @@ typegen:
     - assets.AssetThawed
     - assets.Destroyed
 
-
 mappings:
   mappingsModule: lib/mappings
   eventHandlers:
     - event: balances.Transfer
       handler: balancesTransfer
+    - event: balances.Deposit
+      handler: transferFee
   extrinsicHandlers:
   preBlockHooks:
   postBlockHooks:
