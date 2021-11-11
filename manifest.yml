@@ -26,6 +26,8 @@ mappings:
       handler: balancesTransfer
     - event: balances.Deposit
       handler: transferFee
+    - event: assets.Created
+      handler: assetCreated
   extrinsicHandlers:
   preBlockHooks:
   postBlockHooks:

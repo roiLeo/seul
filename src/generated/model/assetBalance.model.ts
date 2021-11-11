@@ -12,9 +12,6 @@ export class AssetBalance {
   @PrimaryColumn_()
   id!: string
 
-  /**
-   *  AccountId-AssetId
-   */
   @Index_()
   @ManyToOne_(() => Account, {nullable: false})
   account!: Account

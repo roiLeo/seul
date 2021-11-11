@@ -26,13 +26,16 @@ export class Asset {
   decimal!: number | undefined | null
 
   @Column_("text", {nullable: false})
-  admin!: string
+  owner!: string
 
   @Column_("text", {nullable: true})
   issuer!: string | undefined | null
 
-  @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-  minBalance!: bigint
+  @Column_("text", {nullable: true})
+  creator!: string | undefined | null
+
+  @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
+  minBalance!: bigint | undefined | null
 
   @Column_("varchar", {length: 9, nullable: false})
   status!: AssetStatus

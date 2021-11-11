@@ -12,9 +12,6 @@ export class Transfer {
   @PrimaryColumn_()
   id!: string
 
-  /**
-   * event id
-   */
   @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
   amount!: bigint
 
@@ -31,9 +28,6 @@ export class Transfer {
   @ManyToOne_(() => Asset, {nullable: true})
   asset!: Asset | undefined | null
 
-  /**
-   * If asset is null, then its a regular DOT/KSM transfer
-   */
   @Column_("varchar", {length: 7, nullable: false})
   type!: TransferType
 

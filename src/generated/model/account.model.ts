@@ -12,9 +12,6 @@ export class Account {
   @PrimaryColumn_()
   id!: string
 
-  /**
-   * Account address
-   */
   @Column_("text", {nullable: false})
   wallet!: string
 

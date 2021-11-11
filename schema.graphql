@@ -16,9 +16,10 @@ type Asset @entity {
   symbol: String
   freezer: String
   decimal: Int
-  admin: String!
+  owner: String!
   issuer: String
-  minBalance: BigInt!
+  creator: String
+  minBalance: BigInt
   status: AssetStatus!
   transfers: [Transfer!] @derivedFrom(field: "asset")
   assetBalances: [AssetBalance!] @derivedFrom(field: "asset")
