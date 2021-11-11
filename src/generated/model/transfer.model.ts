@@ -21,6 +21,9 @@ export class Transfer {
   @Column_("text", {nullable: true})
   from!: string | undefined | null
 
+  @Column_("text", {nullable: true})
+  delegator!: string | undefined | null
+
   @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
   fee!: bigint | undefined | null
 
@@ -28,7 +31,7 @@ export class Transfer {
   @ManyToOne_(() => Asset, {nullable: true})
   asset!: Asset | undefined | null
 
-  @Column_("varchar", {length: 7, nullable: false})
+  @Column_("varchar", {length: 9, nullable: false})
   type!: TransferType
 
   @Column_("text", {nullable: true})

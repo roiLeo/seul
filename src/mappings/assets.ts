@@ -87,3 +87,61 @@ export async function assetIssued({
   transfer.success = true;
   await store.save(transfer);
 }
+export async function assetTransfer({
+  store,
+  event,
+  block,
+  extrinsic,
+}: EventContext & StoreContext): Promise<void> {
+  const [asset_id, from, to, amount] = new Assets.TransferredEvent(event)
+    .params;
+  const asset = await get(store, Asset, asset_id.toString());
+  if (!asset) {
+    console.error("No asset found for id", asset_id.toString());
+    process.exit(1);
+  }
+
+  const transfer = new Transfer();
+  transfer.amount = amount.toBigInt();
+  transfer.asset = asset;
+  transfer.blockHash = block.hash;
+  transfer.blockNum = block.height;
+  transfer.createdAt = new Date(block.timestamp);
+  transfer.extrinisicId = extrinsic?.id;
+  transfer.to = to.toString();
+  transfer.from = from.toString();
+  transfer.id = event.id;
+  transfer.type = TransferType.REGULAR;
+  transfer.success = true;
+  await store.save(transfer);
+}
+
+export async function assetTransferredApproved({
+  store,
+  event,
+  block,
+  extrinsic,
+}: EventContext & StoreContext): Promise<void> {
+  const [asset_id, from, delegtor, to, amount] =
+    new Assets.TransferredApprovedEvent(event).params;
+  const asset = await get(store, Asset, asset_id.toString());
+  if (!asset) {
+    console.error("No asset found for id", asset_id.toString());
+    process.exit(1);
+  }
+
+  const transfer = new Transfer();
+  transfer.amount = amount.toBigInt();
+  transfer.asset = asset;
+  transfer.blockHash = block.hash;
+  transfer.blockNum = block.height;
+  transfer.createdAt = new Date(block.timestamp);
+  transfer.extrinisicId = extrinsic?.id;
+  transfer.to = to.toString();
+  transfer.from = from.toString();
+  transfer.delegator = delegtor.toString();
+  transfer.id = event.id;
+  transfer.type = TransferType.DELEGATED;
+  transfer.success = true;
+  await store.save(transfer);
+}

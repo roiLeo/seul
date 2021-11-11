@@ -6,6 +6,7 @@ enum AssetStatus {
 
 enum TransferType {
   REGULAR
+  DELEGATED #Transfer approved amount by a delegator
   MINT
   BURN
 }
@@ -53,6 +54,7 @@ type Transfer @entity {
   amount: BigInt!
   to: String!
   from: String
+  delegator: String # Delegator address for transfer by delegator
   fee: BigInt
   asset: Asset #If asset is null, then its a regular DOT/KSM transfer
   type: TransferType!

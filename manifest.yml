@@ -24,10 +24,10 @@ typegen:
 mappings:
   mappingsModule: lib/mappings
   eventHandlers:
-    - event: balances.Transfer
-      handler: balancesTransfer
-    - event: balances.Deposit
-      handler: transferFee
+    # - event: balances.Transfer
+    #   handler: balancesTransfer
+    # - event: balances.Deposit
+    #   handler: transferFee
     - event: assets.Created
       handler: assetCreated
     - event: assets.MetadataSet
@@ -36,6 +36,10 @@ mappings:
       handler: assetMetadataCleared
     - event: assets.Issued
       handler: assetIssued
+    # - event: assets.Transferred
+    #   handler: assetTransfer
+    - event: assets.TransferredApproved
+      handler: assetTransfer
   extrinsicHandlers:
   preBlockHooks:
   postBlockHooks:
