@@ -32,6 +32,8 @@ mappings:
       handler: assetCreated
     - event: assets.MetadataSet
       handler: assetMetadata
+    - event: assets.MetadataCleared
+      handler: assetMetadataCleared
   extrinsicHandlers:
   preBlockHooks:
   postBlockHooks:

@@ -39,3 +39,21 @@ export async function assetMetadata({
 
   await store.save(asset);
 }
+export async function assetMetadataCleared({
+  store,
+  event,
+}: EventContext & StoreContext): Promise<void> {
+  const [asset_id] = new Assets.MetadataClearedEvent(event).params;
+  const asset = await get(store, Asset, asset_id.toString());
+  if (!asset) {
+    console.error("No asset found for id", asset_id.toString());
+    process.exit(1);
+  }
+
+  asset.name = null;
+  asset.symbol = null;
+  asset.decimal = null;
+  // asset.status = is_frozen.toJSON() ? AssetStatus.FREEZED : AssetStatus.ACTIVE;
+
+  await store.save(asset);
+}
