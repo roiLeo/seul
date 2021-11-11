@@ -40,6 +40,9 @@ export class Asset {
   @Column_("varchar", {length: 9, nullable: false})
   status!: AssetStatus
 
+  @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
+  totalSupply!: bigint | undefined | null
+
   @OneToMany_(() => Transfer, e => e.asset)
   transfers!: Transfer[]
 

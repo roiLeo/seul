@@ -18,8 +18,8 @@ export class Transfer {
   @Column_("text", {nullable: false})
   to!: string
 
-  @Column_("text", {nullable: false})
-  from!: string
+  @Column_("text", {nullable: true})
+  from!: string | undefined | null
 
   @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
   fee!: bigint | undefined | null

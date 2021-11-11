@@ -23,7 +23,7 @@ export async function get<T extends { id: string }>(
   id: string,
   where?: WhereCondition
 ): Promise<T | undefined> {
-  let e = await store.get(entityConstructor, {
+  const e = await store.get(entityConstructor, {
     where: where ? where : { id },
   });
 

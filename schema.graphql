@@ -21,6 +21,7 @@ type Asset @entity {
   creator: String
   minBalance: BigInt
   status: AssetStatus!
+  totalSupply: BigInt
   transfers: [Transfer!] @derivedFrom(field: "asset")
   assetBalances: [AssetBalance!] @derivedFrom(field: "asset")
 }
@@ -51,7 +52,7 @@ type Transfer @entity {
   id: ID! #event id
   amount: BigInt!
   to: String!
-  from: String!
+  from: String
   fee: BigInt
   asset: Asset #If asset is null, then its a regular DOT/KSM transfer
   type: TransferType!
