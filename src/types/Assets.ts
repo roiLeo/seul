@@ -1,6 +1,6 @@
 import {create} from './_registry'
 import {AccountId32} from '@polkadot/types/interfaces'
-import {u128, u32} from '@polkadot/types'
+import {Bytes, bool, u128, u32, u8} from '@polkadot/types'
 import {SubstrateEvent} from '@subsquid/hydra-common'
 
 export namespace Assets {
@@ -118,6 +118,28 @@ export namespace Assets {
    * An asset class was destroyed.
    */
   export class DestroyedEvent {
+    constructor(private event: SubstrateEvent) {}
+
+    get params(): [u32] {
+      return [create('u32', this.event.params[0].value)]
+    }
+  }
+
+  /**
+   * New metadata has been set for an asset. \[asset_id, name, symbol, decimals, is_frozen\]
+   */
+  export class MetadataSetEvent {
+    constructor(private event: SubstrateEvent) {}
+
+    get params(): [u32, Bytes, Bytes, u8, bool] {
+      return [create('u32', this.event.params[0].value), create('Bytes', this.event.params[1].value), create('Bytes', this.event.params[2].value), create('u8', this.event.params[3].value), create('bool', this.event.params[4].value)]
+    }
+  }
+
+  /**
+   * Metadata has been cleared for an asset. \[asset_id\]
+   */
+  export class MetadataClearedEvent {
     constructor(private event: SubstrateEvent) {}
 
     get params(): [u32] {

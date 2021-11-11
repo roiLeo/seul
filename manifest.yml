@@ -7,6 +7,8 @@ typegen:
     - balances.Transfer
     - balances.Deposit
     - assets.Created
+    - assets.MetadataSet
+    - assets.MetadataCleared
     - assets.Issued
     - assets.Transferred
     - assets.TransferredApproved
