@@ -34,6 +34,8 @@ mappings:
       handler: assetFrozen
     - event: assets.AssetThawed
       handler: assetThawed
+    - event: assets.Destroyed
+      handler: assetDestroyed
     - event: assets.OwnerChanged
       handler: assetOwnerChanged
     - event: assets.TeamChanged
