@@ -1,7 +1,29 @@
-import { EventContext, StoreContext } from "@subsquid/hydra-common";
+import {
+  DatabaseManager,
+  EventContext,
+  StoreContext,
+} from "@subsquid/hydra-common";
 import { Asset, AssetStatus, Transfer, TransferType } from "../generated/model";
 import { Assets } from "../types/index";
 import { get } from "./helpers/entity-utils";
+
+/**
+ * Get asset from database
+ * @param {string} assetId
+ * @param {DatabaseManager} store
+ * @returns {Promise<Asset>}
+ */
+export async function getAssetById(
+  assetId: string,
+  store: DatabaseManager
+): Promise<Asset> {
+  const asset = await get(store, Asset, assetId.toString());
+  if (!asset) {
+    console.error("No asset found for id", assetId.toString());
+    process.exit(1);
+  }
+  return asset;
+}
 
 export async function assetCreated({
   store,
@@ -24,27 +46,18 @@ export async function assetOwnerChanged({
   event,
 }: EventContext & StoreContext): Promise<void> {
   const [asset_id, owner] = new Assets.OwnerChangedEvent(event).params;
-  const asset = await get(store, Asset, asset_id.toString());
-  if (!asset) {
-    console.error("No asset found for id", asset_id.toString());
-    process.exit(1);
-  }
-
+  const asset = await getAssetById(asset_id.toString(), store);
   asset.owner = owner.toString();
-
   await store.save(asset);
 }
+
 export async function assetTeamChanged({
   store,
   event,
 }: EventContext & StoreContext): Promise<void> {
   const [asset_id, issuer, admin, freezer] = new Assets.TeamChangedEvent(event)
     .params;
-  const asset = await get(store, Asset, asset_id.toString());
-  if (!asset) {
-    console.error("No asset found for id", asset_id.toString());
-    process.exit(1);
-  }
+  const asset = await getAssetById(asset_id.toString(), store);
 
   asset.issuer = issuer.toString();
   asset.admin = admin.toString();
@@ -58,11 +71,7 @@ export async function assetFrozen({
   event,
 }: EventContext & StoreContext): Promise<void> {
   const [asset_id] = new Assets.AssetFrozenEvent(event).params;
-  const asset = await get(store, Asset, asset_id.toString());
-  if (!asset) {
-    console.error("No asset found for id", asset_id.toString());
-    process.exit(1);
-  }
+  const asset = await getAssetById(asset_id.toString(), store);
 
   asset.status = AssetStatus.FREEZED;
 
@@ -74,26 +83,19 @@ export async function assetThawed({
   event,
 }: EventContext & StoreContext): Promise<void> {
   const [asset_id] = new Assets.AssetThawedEvent(event).params;
-  const asset = await get(store, Asset, asset_id.toString());
-  if (!asset) {
-    console.error("No asset found for id", asset_id.toString());
-    process.exit(1);
-  }
+  const asset = await getAssetById(asset_id.toString(), store);
 
   asset.status = AssetStatus.ACTIVE;
 
   await store.save(asset);
 }
+
 export async function assetDestroyed({
   store,
   event,
 }: EventContext & StoreContext): Promise<void> {
   const [asset_id] = new Assets.DestroyedEvent(event).params;
-  const asset = await get(store, Asset, asset_id.toString());
-  if (!asset) {
-    console.error("No asset found for id", asset_id.toString());
-    process.exit(1);
-  }
+  const asset = await getAssetById(asset_id.toString(), store);
 
   asset.status = AssetStatus.DESTROYED;
 
@@ -106,11 +108,7 @@ export async function assetMetadata({
 }: EventContext & StoreContext): Promise<void> {
   const [asset_id, name, symbol, decimals, is_frozen] =
     new Assets.MetadataSetEvent(event).params;
-  const asset = await get(store, Asset, asset_id.toString());
-  if (!asset) {
-    console.error("No asset found for id", asset_id.toString());
-    process.exit(1);
-  }
+  const asset = await getAssetById(asset_id.toString(), store);
 
   asset.name = name.toString();
   asset.symbol = symbol.toString();
@@ -125,11 +123,7 @@ export async function assetMetadataCleared({
   event,
 }: EventContext & StoreContext): Promise<void> {
   const [asset_id] = new Assets.MetadataClearedEvent(event).params;
-  const asset = await get(store, Asset, asset_id.toString());
-  if (!asset) {
-    console.error("No asset found for id", asset_id.toString());
-    process.exit(1);
-  }
+  const asset = await getAssetById(asset_id.toString(), store);
 
   asset.name = null;
   asset.symbol = null;
@@ -146,11 +140,7 @@ export async function assetIssued({
   extrinsic,
 }: EventContext & StoreContext): Promise<void> {
   const [asset_id, owner, issued] = new Assets.IssuedEvent(event).params;
-  const asset = await get(store, Asset, asset_id.toString());
-  if (!asset) {
-    console.error("No asset found for id", asset_id.toString());
-    process.exit(1);
-  }
+  const asset = await getAssetById(asset_id.toString(), store);
 
   asset.totalSupply = asset.totalSupply || 0n + issued.toBigInt();
   await store.save(asset);
@@ -176,11 +166,7 @@ export async function assetTransfer({
 }: EventContext & StoreContext): Promise<void> {
   const [asset_id, from, to, amount] = new Assets.TransferredEvent(event)
     .params;
-  const asset = await get(store, Asset, asset_id.toString());
-  if (!asset) {
-    console.error("No asset found for id", asset_id.toString());
-    process.exit(1);
-  }
+  const asset = await getAssetById(asset_id.toString(), store);
 
   const transfer = new Transfer();
   transfer.amount = amount.toBigInt();
@@ -205,11 +191,7 @@ export async function assetTransferredApproved({
 }: EventContext & StoreContext): Promise<void> {
   const [asset_id, from, delegtor, to, amount] =
     new Assets.TransferredApprovedEvent(event).params;
-  const asset = await get(store, Asset, asset_id.toString());
-  if (!asset) {
-    console.error("No asset found for id", asset_id.toString());
-    process.exit(1);
-  }
+  const asset = await getAssetById(asset_id.toString(), store);
 
   const transfer = new Transfer();
   transfer.amount = amount.toBigInt();
