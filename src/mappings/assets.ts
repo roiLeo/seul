@@ -3,9 +3,17 @@ import {
   EventContext,
   StoreContext,
 } from "@subsquid/hydra-common";
-import { Asset, AssetStatus, Transfer, TransferType } from "../generated/model";
+import {
+  Account,
+  Asset,
+  AssetBalance,
+  AssetStatus,
+  Transfer,
+  TransferType,
+} from "../generated/model";
 import { Assets } from "../types/index";
-import { get } from "./helpers/entity-utils";
+import { getAssetBalanceId } from "./helpers/common";
+import { get, getOrCreate } from "./helpers/entity-utils";
 
 /**
  * Get asset from database
@@ -45,8 +53,8 @@ export async function assetOwnerChanged({
   store,
   event,
 }: EventContext & StoreContext): Promise<void> {
-  const [asset_id, owner] = new Assets.OwnerChangedEvent(event).params;
-  const asset = await getAssetById(asset_id.toString(), store);
+  const [assetId, owner] = new Assets.OwnerChangedEvent(event).params;
+  const asset = await getAssetById(assetId.toString(), store);
   asset.owner = owner.toString();
   await store.save(asset);
 }
@@ -55,9 +63,9 @@ export async function assetTeamChanged({
   store,
   event,
 }: EventContext & StoreContext): Promise<void> {
-  const [asset_id, issuer, admin, freezer] = new Assets.TeamChangedEvent(event)
+  const [assetId, issuer, admin, freezer] = new Assets.TeamChangedEvent(event)
     .params;
-  const asset = await getAssetById(asset_id.toString(), store);
+  const asset = await getAssetById(assetId.toString(), store);
 
   asset.issuer = issuer.toString();
   asset.admin = admin.toString();
@@ -70,8 +78,8 @@ export async function assetFrozen({
   store,
   event,
 }: EventContext & StoreContext): Promise<void> {
-  const [asset_id] = new Assets.AssetFrozenEvent(event).params;
-  const asset = await getAssetById(asset_id.toString(), store);
+  const [assetId] = new Assets.AssetFrozenEvent(event).params;
+  const asset = await getAssetById(assetId.toString(), store);
 
   asset.status = AssetStatus.FREEZED;
 
@@ -82,8 +90,8 @@ export async function assetThawed({
   store,
   event,
 }: EventContext & StoreContext): Promise<void> {
-  const [asset_id] = new Assets.AssetThawedEvent(event).params;
-  const asset = await getAssetById(asset_id.toString(), store);
+  const [assetId] = new Assets.AssetThawedEvent(event).params;
+  const asset = await getAssetById(assetId.toString(), store);
 
   asset.status = AssetStatus.ACTIVE;
 
@@ -94,8 +102,8 @@ export async function assetDestroyed({
   store,
   event,
 }: EventContext & StoreContext): Promise<void> {
-  const [asset_id] = new Assets.DestroyedEvent(event).params;
-  const asset = await getAssetById(asset_id.toString(), store);
+  const [assetId] = new Assets.DestroyedEvent(event).params;
+  const asset = await getAssetById(assetId.toString(), store);
 
   asset.status = AssetStatus.DESTROYED;
 
@@ -106,9 +114,9 @@ export async function assetMetadata({
   store,
   event,
 }: EventContext & StoreContext): Promise<void> {
-  const [asset_id, name, symbol, decimals, is_frozen] =
+  const [assetId, name, symbol, decimals, is_frozen] =
     new Assets.MetadataSetEvent(event).params;
-  const asset = await getAssetById(asset_id.toString(), store);
+  const asset = await getAssetById(assetId.toString(), store);
 
   asset.name = name.toString();
   asset.symbol = symbol.toString();
@@ -122,8 +130,8 @@ export async function assetMetadataCleared({
   store,
   event,
 }: EventContext & StoreContext): Promise<void> {
-  const [asset_id] = new Assets.MetadataClearedEvent(event).params;
-  const asset = await getAssetById(asset_id.toString(), store);
+  const [assetId] = new Assets.MetadataClearedEvent(event).params;
+  const asset = await getAssetById(assetId.toString(), store);
 
   asset.name = null;
   asset.symbol = null;
@@ -139,11 +147,31 @@ export async function assetIssued({
   block,
   extrinsic,
 }: EventContext & StoreContext): Promise<void> {
-  const [asset_id, owner, issued] = new Assets.IssuedEvent(event).params;
-  const asset = await getAssetById(asset_id.toString(), store);
+  const [assetId, owner, issued] = new Assets.IssuedEvent(event).params;
+  const id = getAssetBalanceId(assetId.toString(), owner.toString());
+  const getAsset = getAssetById(assetId.toString(), store);
+  const getOwnerAccount = getOrCreate(store, Account, owner.toString());
+  const getOwnerAssetBalance = getOrCreate(store, AssetBalance, id);
+  const [asset, account, assetBalance] = await Promise.all([
+    getAsset,
+    getOwnerAccount,
+    getOwnerAssetBalance,
+  ]);
 
   asset.totalSupply = asset.totalSupply || 0n + issued.toBigInt();
+
   await store.save(asset);
+  if (!account.wallet) {
+    account.wallet = owner.toString();
+    account.balance = account.balance || 0n;
+    await store.save(account);
+  }
+
+  assetBalance.asset = asset;
+  assetBalance.balance = assetBalance.balance || 0n + issued.toBigInt();
+  assetBalance.reserveBalance = assetBalance.reserveBalance || 0n;
+  assetBalance.wallet = account;
+  await store.save(assetBalance);
 
   const transfer = new Transfer();
   transfer.amount = issued.toBigInt();
@@ -158,15 +186,15 @@ export async function assetIssued({
   transfer.success = true;
   await store.save(transfer);
 }
+
 export async function assetTransfer({
   store,
   event,
   block,
   extrinsic,
 }: EventContext & StoreContext): Promise<void> {
-  const [asset_id, from, to, amount] = new Assets.TransferredEvent(event)
-    .params;
-  const asset = await getAssetById(asset_id.toString(), store);
+  const [assetId, from, to, amount] = new Assets.TransferredEvent(event).params;
+  const asset = await getAssetById(assetId.toString(), store);
 
   const transfer = new Transfer();
   transfer.amount = amount.toBigInt();
@@ -189,9 +217,9 @@ export async function assetTransferredApproved({
   block,
   extrinsic,
 }: EventContext & StoreContext): Promise<void> {
-  const [asset_id, from, delegtor, to, amount] =
+  const [assetId, from, delegtor, to, amount] =
     new Assets.TransferredApprovedEvent(event).params;
-  const asset = await getAssetById(asset_id.toString(), store);
+  const asset = await getAssetById(assetId.toString(), store);
 
   const transfer = new Transfer();
   transfer.amount = amount.toBigInt();
