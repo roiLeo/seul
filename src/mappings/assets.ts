@@ -218,7 +218,14 @@ export async function assetTransfer({
   extrinsic,
 }: EventContext & StoreContext): Promise<void> {
   const [assetId, from, to, amount] = new Assets.TransferredEvent(event).params;
-  const asset = await getAssetById(assetId.toString(), store);
+  const [asset] = await changeAssetBalance(
+    store,
+    assetId.toString(),
+    from.toString(),
+    -amount.toBigInt() // decrements from sender account
+  );
+
+  await changeAssetBalance(store, asset, to.toString(), amount.toBigInt());
 
   const transfer = new Transfer();
   transfer.amount = amount.toBigInt();
@@ -243,7 +250,14 @@ export async function assetTransferredApproved({
 }: EventContext & StoreContext): Promise<void> {
   const [assetId, from, delegtor, to, amount] =
     new Assets.TransferredApprovedEvent(event).params;
-  const asset = await getAssetById(assetId.toString(), store);
+  const [asset] = await changeAssetBalance(
+    store,
+    assetId.toString(),
+    from.toString(),
+    -amount.toBigInt() // decrements from sender account
+  );
+
+  await changeAssetBalance(store, asset, to.toString(), amount.toBigInt());
 
   const transfer = new Transfer();
   transfer.amount = amount.toBigInt();
