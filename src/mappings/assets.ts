@@ -179,8 +179,8 @@ export async function assetMetadata({
     new Assets.MetadataSetEvent(event).params;
   const asset = await getAssetById(assetId.toString(), store);
 
-  asset.name = name.toString();
-  asset.symbol = symbol.toString();
+  asset.name = String.fromCharCode(...name);
+  asset.symbol = String.fromCharCode(...symbol);
   asset.decimal = decimals.toNumber();
   asset.status = is_frozen.toJSON() ? AssetStatus.FREEZED : AssetStatus.ACTIVE;
 
