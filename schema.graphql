@@ -9,6 +9,8 @@ enum TransferType {
   DELEGATED #Transfer approved amount by a delegator
   MINT
   BURN
+  FREEZE
+  THAWED
 }
 
 type Asset @entity {
@@ -32,7 +34,7 @@ type AssetBalance @entity {
   id: ID! #AccountId-AssetId
   wallet: Account!
   balance: BigInt!
-  reserveBalance: BigInt!
+  status: AssetStatus!
   asset: Asset!
 }
 

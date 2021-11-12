@@ -3,4 +3,6 @@ export enum TransferType {
   DELEGATED = "DELEGATED",
   MINT = "MINT",
   BURN = "BURN",
+  FREEZE = "FREEZE",
+  THAWED = "THAWED",
 }

@@ -34,18 +34,16 @@ export async function getAssetById(
 }
 
 /**
- * update asset balance
- * @param {DatabaseManager}store
- * @param {Asset | string}asset  or assetId
- * @param {string}wallet
- * @param {bigint} amount
- * @returns {Promise<[Asset, Account, AssetBalance]>}
+ * Get all details of asset for an account
+ * @param {DatabaseManager} store
+ * @param {Asset | string} asset  or assetId
+ * @param {string} wallet
+ * @returns
  */
-export async function changeAssetBalance(
+export async function getAssetAccountDetails(
   store: DatabaseManager,
   asset: Asset | string,
-  wallet: string,
-  amount: bigint
+  wallet: string
 ): Promise<[Asset, Account, AssetBalance]> {
   if (typeof asset == "string") {
     asset = await getAssetById(asset, store);
@@ -63,10 +61,31 @@ export async function changeAssetBalance(
     account.balance = account.balance || 0n;
     await store.save(account);
   }
+  return [asset, account, assetBalance];
+}
+
+/**
+ * update asset balance
+ * @param {DatabaseManager}store
+ * @param {Asset | string}asset  or assetId
+ * @param {string}wallet
+ * @param {bigint} amount
+ * @returns {Promise<[Asset, Account, AssetBalance]>}
+ */
+export async function changeAssetBalance(
+  store: DatabaseManager,
+  assetId: Asset | string,
+  wallet: string,
+  amount: bigint
+): Promise<[Asset, Account, AssetBalance]> {
+  const [asset, account, assetBalance] = await getAssetAccountDetails(
+    store,
+    assetId,
+    wallet
+  );
 
   assetBalance.asset = asset;
   assetBalance.balance = assetBalance.balance || 0n + amount;
-  assetBalance.reserveBalance = assetBalance.reserveBalance || 0n;
   assetBalance.wallet = account;
   await store.save(assetBalance);
   return [asset, account, assetBalance];
@@ -242,6 +261,34 @@ export async function assetTransfer({
   await store.save(transfer);
 }
 
+export async function assetBalanceBurned({
+  store,
+  event,
+  block,
+  extrinsic,
+}: EventContext & StoreContext): Promise<void> {
+  const [assetId, from, amount] = new Assets.BurnedEvent(event).params;
+  const [asset] = await changeAssetBalance(
+    store,
+    assetId.toString(),
+    from.toString(),
+    -amount.toBigInt() // decrements from account
+  );
+
+  const transfer = new Transfer();
+  transfer.amount = amount.toBigInt();
+  transfer.asset = asset;
+  transfer.blockHash = block.hash;
+  transfer.blockNum = block.height;
+  transfer.createdAt = new Date(block.timestamp);
+  transfer.extrinisicId = extrinsic?.id;
+  transfer.from = from.toString();
+  transfer.id = event.id;
+  transfer.type = TransferType.BURN;
+  transfer.success = true;
+  await store.save(transfer);
+}
+
 export async function assetTransferredApproved({
   store,
   event,
@@ -271,6 +318,64 @@ export async function assetTransferredApproved({
   transfer.delegator = delegtor.toString();
   transfer.id = event.id;
   transfer.type = TransferType.DELEGATED;
+  transfer.success = true;
+  await store.save(transfer);
+}
+
+export async function assetAccountFrozen({
+  store,
+  event,
+  block,
+  extrinsic,
+}: EventContext & StoreContext): Promise<void> {
+  const [assetId, who] = new Assets.FrozenEvent(event).params;
+  const [asset, , assetBalance] = await getAssetAccountDetails(
+    store,
+    assetId.toString(),
+    who.toString()
+  );
+  assetBalance.status = AssetStatus.FREEZED;
+  await store.save(assetBalance);
+
+  const transfer = new Transfer();
+  transfer.amount = assetBalance.balance;
+  transfer.asset = asset;
+  transfer.blockHash = block.hash;
+  transfer.blockNum = block.height;
+  transfer.createdAt = new Date(block.timestamp);
+  transfer.extrinisicId = extrinsic?.id;
+  transfer.from = who.toString();
+  transfer.id = event.id;
+  transfer.type = TransferType.FREEZE;
+  transfer.success = true;
+  await store.save(transfer);
+}
+
+export async function assetBalanceThawed({
+  store,
+  event,
+  block,
+  extrinsic,
+}: EventContext & StoreContext): Promise<void> {
+  const [assetId, who] = new Assets.ThawedEvent(event).params;
+  const [asset, , assetBalance] = await getAssetAccountDetails(
+    store,
+    assetId.toString(),
+    who.toString()
+  );
+  assetBalance.status = AssetStatus.ACTIVE;
+  await store.save(assetBalance);
+
+  const transfer = new Transfer();
+  transfer.amount = assetBalance.balance;
+  transfer.asset = asset;
+  transfer.blockHash = block.hash;
+  transfer.blockNum = block.height;
+  transfer.createdAt = new Date(block.timestamp);
+  transfer.extrinisicId = extrinsic?.id;
+  transfer.from = who.toString();
+  transfer.id = event.id;
+  transfer.type = TransferType.THAWED;
   transfer.success = true;
   await store.save(transfer);
 }

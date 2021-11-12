@@ -50,6 +50,12 @@ mappings:
       handler: assetTransfer
     - event: assets.TransferredApproved
       handler: assetTransfer
+    - event: assets.Frozen
+      handler: assetAccountFrozen
+    - event: assets.Burned
+      handler: assetBalanceBurned
+    - event: assets.Thawed
+      handler: assetBalanceThawed
   extrinsicHandlers:
   preBlockHooks:
   postBlockHooks:
