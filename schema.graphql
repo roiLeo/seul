@@ -56,7 +56,7 @@ type HistoricalBalance @entity {
 type Transfer @entity {
   id: ID! #event id
   amount: BigInt!
-  to: String!
+  to: String
   from: String
   delegator: String # Delegator address for transfer by delegator
   fee: BigInt

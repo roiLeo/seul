@@ -61,6 +61,9 @@ export async function getAssetAccountDetails(
     account.balance = account.balance || 0n;
     await store.save(account);
   }
+  assetBalance.status = assetBalance.status
+    ? assetBalance.status
+    : AssetStatus.ACTIVE;
   return [asset, account, assetBalance];
 }
 
