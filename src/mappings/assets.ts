@@ -33,6 +33,45 @@ export async function getAssetById(
   return asset;
 }
 
+/**
+ * update asset balance
+ * @param {DatabaseManager}store
+ * @param {Asset | string}asset  or assetId
+ * @param {string}wallet
+ * @param {bigint} amount
+ * @returns {Promise<[Asset, Account, AssetBalance]>}
+ */
+export async function changeAssetBalance(
+  store: DatabaseManager,
+  asset: Asset | string,
+  wallet: string,
+  amount: bigint
+): Promise<[Asset, Account, AssetBalance]> {
+  if (typeof asset == "string") {
+    asset = await getAssetById(asset, store);
+  }
+  const id = getAssetBalanceId(asset.id, wallet);
+  const getOwnerAccount = getOrCreate(store, Account, wallet);
+  const getOwnerAssetBalance = getOrCreate(store, AssetBalance, id);
+  const [account, assetBalance] = await Promise.all([
+    getOwnerAccount,
+    getOwnerAssetBalance,
+  ]);
+
+  if (!account.wallet) {
+    account.wallet = wallet;
+    account.balance = account.balance || 0n;
+    await store.save(account);
+  }
+
+  assetBalance.asset = asset;
+  assetBalance.balance = assetBalance.balance || 0n + amount;
+  assetBalance.reserveBalance = assetBalance.reserveBalance || 0n;
+  assetBalance.wallet = account;
+  await store.save(assetBalance);
+  return [asset, account, assetBalance];
+}
+
 export async function assetCreated({
   store,
   event,
@@ -148,30 +187,15 @@ export async function assetIssued({
   extrinsic,
 }: EventContext & StoreContext): Promise<void> {
   const [assetId, owner, issued] = new Assets.IssuedEvent(event).params;
-  const id = getAssetBalanceId(assetId.toString(), owner.toString());
-  const getAsset = getAssetById(assetId.toString(), store);
-  const getOwnerAccount = getOrCreate(store, Account, owner.toString());
-  const getOwnerAssetBalance = getOrCreate(store, AssetBalance, id);
-  const [asset, account, assetBalance] = await Promise.all([
-    getAsset,
-    getOwnerAccount,
-    getOwnerAssetBalance,
-  ]);
-
+  const [asset] = await changeAssetBalance(
+    store,
+    assetId.toString(),
+    owner.toString(),
+    issued.toBigInt()
+  );
   asset.totalSupply = asset.totalSupply || 0n + issued.toBigInt();
 
   await store.save(asset);
-  if (!account.wallet) {
-    account.wallet = owner.toString();
-    account.balance = account.balance || 0n;
-    await store.save(account);
-  }
-
-  assetBalance.asset = asset;
-  assetBalance.balance = assetBalance.balance || 0n + issued.toBigInt();
-  assetBalance.reserveBalance = assetBalance.reserveBalance || 0n;
-  assetBalance.wallet = account;
-  await store.save(assetBalance);
 
   const transfer = new Transfer();
   transfer.amount = issued.toBigInt();
