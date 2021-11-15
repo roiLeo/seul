@@ -67,7 +67,7 @@ export async function transferFee({
   if (extrinsic?.id) {
     const transfer = await get(store, Transfer, extrinsic?.id);
     if (!transfer) {
-      console.error("No transfer found for deposit event", event.id);
+      // console.error("No transfer found for deposit event", event.id);
       return;
     }
     transfer.fee = fees.toBigInt();
