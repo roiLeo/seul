@@ -32,7 +32,7 @@ type Asset @entity {
 
 type AssetBalance @entity {
   id: ID! #AccountId-AssetId
-  wallet: Account!
+  account: Account!
   balance: BigInt!
   status: AssetStatus!
   asset: Asset!
@@ -42,7 +42,7 @@ type Account @entity {
   id: ID! #Account address
   wallet: String! @unique
   balance: BigInt! #Native KSM balance
-  assets: [AssetBalance!] @derivedFrom(field: "wallet")
+  assets: [AssetBalance!] @derivedFrom(field: "account")
   historicalBalances: [HistoricalBalance!] @derivedFrom(field: "account")
 }
 

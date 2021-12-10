@@ -18,7 +18,7 @@ export class Account {
   @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
   balance!: bigint
 
-  @OneToMany_(() => AssetBalance, e => e.wallet)
+  @OneToMany_(() => AssetBalance, e => e.account)
   assets!: AssetBalance[]
 
   @OneToMany_(() => HistoricalBalance, e => e.account)
