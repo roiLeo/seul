@@ -14,6 +14,7 @@ export class UniqueInstance {
   @PrimaryColumn_()
   id!: string
 
+  @Index_()
   @Column_("text", {nullable: false})
   innerID!: string
 
@@ -25,6 +26,7 @@ export class UniqueInstance {
   @ManyToOne_(() => Account, {nullable: false})
   owner!: Account
 
+  @Index_()
   @Column_("varchar", {length: 9, nullable: false})
   status!: AssetStatus
 

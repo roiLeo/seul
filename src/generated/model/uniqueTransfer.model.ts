@@ -13,9 +13,11 @@ export class UniqueTransfer {
   @PrimaryColumn_()
   id!: string
 
+  @Index_()
   @Column_("text", {nullable: true})
   to!: string | undefined | null
 
+  @Index_()
   @Column_("text", {nullable: true})
   from!: string | undefined | null
 
@@ -33,21 +35,26 @@ export class UniqueTransfer {
   @ManyToOne_(() => UniqueInstance, {nullable: true})
   uniqueInstance!: UniqueInstance | undefined | null
 
+  @Index_()
   @Column_("varchar", {length: 9, nullable: false})
   type!: TransferType
 
+  @Index_()
   @Column_("text", {nullable: true})
   extrinisicId!: string | undefined | null
 
   @Column_("bool", {nullable: false})
   success!: boolean
-
+  
+  @Index_()
   @Column_("timestamp with time zone", {nullable: false})
   createdAt!: Date
 
+  @Index_()
   @Column_("text", {nullable: false})
   blockHash!: string
 
+  @Index_()
   @Column_("integer", {nullable: false})
   blockNum!: number
 }

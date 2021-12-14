@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
+import {Entity as Entity_, Index as Index_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
 import * as marshal from "../marshal"
 import {AssetStatus} from "./assetStatus"
 import {UniqueInstance} from "./uniqueInstance.model"
@@ -12,6 +12,7 @@ export class UniqueClass {
   @PrimaryColumn_()
   id!: string
 
+  @Index_()
   @Column_("text", {nullable: true})
   owner!: string | undefined | null
 
@@ -33,6 +34,7 @@ export class UniqueClass {
   @Column_("text", {nullable: true})
   name!: string | undefined | null
 
+  @Index_()
   @Column_("varchar", {length: 9, nullable: false})
   status!: AssetStatus
 
