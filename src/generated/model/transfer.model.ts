@@ -15,9 +15,11 @@ export class Transfer {
   @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
   amount!: bigint | undefined | null
 
+  @Index_()
   @Column_("text", {nullable: true})
   to!: string | undefined | null
 
+  @Index_()
   @Column_("text", {nullable: true})
   from!: string | undefined | null
 
@@ -31,21 +33,26 @@ export class Transfer {
   @ManyToOne_(() => Asset, {nullable: true})
   asset!: Asset | undefined | null
 
+  @Index_()
   @Column_("varchar", {length: 9, nullable: false})
   type!: TransferType
 
+  @Index_()
   @Column_("text", {nullable: true})
   extrinisicId!: string | undefined | null
 
+  @Index_()
   @Column_("bool", {nullable: false})
   success!: boolean
 
+  @Index_()
   @Column_("timestamp with time zone", {nullable: false})
   createdAt!: Date
 
   @Column_("text", {nullable: false})
   blockHash!: string
 
+  @Index_()
   @Column_("integer", {nullable: false})
   blockNum!: number
 }

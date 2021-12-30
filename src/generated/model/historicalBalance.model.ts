@@ -15,9 +15,11 @@ export class HistoricalBalance {
   @ManyToOne_(() => Account, {nullable: false})
   account!: Account
 
+  @Index_()
   @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
   balance!: bigint
 
+  @Index_()
   @Column_("timestamp with time zone", {nullable: false})
   timestamp!: Date
 }

@@ -17,9 +17,11 @@ export class AssetBalance {
   @ManyToOne_(() => Account, {nullable: false})
   account!: Account
 
+  @Index_()
   @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
   balance!: bigint
 
+  @Index_()
   @Column_("varchar", {length: 9, nullable: false})
   status!: AssetStatus
 
