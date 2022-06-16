@@ -1,18 +1,13 @@
 import { AccountId32 } from "@polkadot/types/interfaces";
 import {
-  DatabaseManager,
-  EventContext,
-  StoreContext,
-} from "@subsquid/hydra-common";
-import {
   Account,
   Asset,
   AssetBalance,
   AssetStatus,
   Transfer,
   TransferType,
-} from "../generated/model";
-import { Assets } from "../types/index";
+} from "../model/generated";
+import { Assets } from "./index";
 import { getAssetBalanceId } from "./helpers/common";
 import { get, getOrCreate } from "./helpers/entity-utils";
 
@@ -246,7 +241,7 @@ export async function assetTransfer({
     store,
     assetId.toString(),
     from,
-    -amount.toBigInt() // decrements from sender account
+    BigInt(-amount) // decrements from sender account
   );
 
   await changeAssetBalance(store, asset, to, amount.toBigInt());
@@ -277,7 +272,7 @@ export async function assetBalanceBurned({
     store,
     assetId.toString(),
     from,
-    -amount.toBigInt() // decrements from account
+    BigInt(-amount) // decrements from account
   );
 
   const transfer = new Transfer();
@@ -306,7 +301,7 @@ export async function assetTransferredApproved({
     store,
     assetId.toString(),
     from,
-    -amount.toBigInt() // decrements from sender account
+    BigInt(-amount) // decrements from sender account
   );
 
   await changeAssetBalance(store, asset, to, amount.toBigInt());

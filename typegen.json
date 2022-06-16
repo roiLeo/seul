@@ -1,0 +1,14 @@
+{
+	"outDir": "src/types",
+	"chainVersions": "kusamaVersions.json", 
+	"typesBundle": "kusama", 
+	"events": [ 
+	  "balances.Transfer"
+	],
+	"calls": [ 
+	  "timestamp.set"
+	],
+	"storage": [
+	  "System.Account" 
+	]
+  }
