@@ -3,7 +3,6 @@ import * as marshal from "./marshal"
 import {UniqueClass} from "./uniqueClass.model"
 import {UniqueInstance} from "./uniqueInstance.model"
 import {TransferType} from "./_transferType"
-import {MetadataEntity} from "./metadataEntity.model"
 
 @Entity_()
 export class UniqueTransfer {
@@ -49,10 +48,6 @@ export class UniqueTransfer {
   @Column_("text", {nullable: false})
   blockHash!: string
 
-  @Column_("integer", {nullable: false})
+  @Column_("int4", {nullable: false})
   blockNum!: number
-
-  @Index_()
-  @ManyToOne_(() => MetadataEntity, {nullable: true})
-  meta!: MetadataEntity | undefined | null
 }

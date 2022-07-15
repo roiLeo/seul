@@ -38,4 +38,7 @@ export class UniqueClass {
 
   @OneToMany_(() => UniqueInstance, e => e.uniqueClass)
   instances!: UniqueInstance[]
+
+  @Column_("text", {nullable: true})
+  data!: string | undefined | null
 }

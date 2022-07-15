@@ -1,9 +1,8 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_, ManyToOne as ManyToOne_, Index as Index_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
 import * as marshal from "./marshal"
 import {AssetStatus} from "./_assetStatus"
 import {Transfer} from "./transfer.model"
 import {AssetBalance} from "./assetBalance.model"
-import {MetadataEntity} from "./metadataEntity.model"
 
 @Entity_()
 export class Asset {
@@ -23,7 +22,7 @@ export class Asset {
   @Column_("text", {nullable: true})
   freezer!: string | undefined | null
 
-  @Column_("integer", {nullable: true})
+  @Column_("int4", {nullable: true})
   decimal!: number | undefined | null
 
   @Column_("text", {nullable: false})
@@ -52,8 +51,4 @@ export class Asset {
 
   @OneToMany_(() => AssetBalance, e => e.asset)
   assetBalances!: AssetBalance[]
-
-  @Index_()
-  @ManyToOne_(() => MetadataEntity, {nullable: true})
-  meta!: MetadataEntity | undefined | null
 }

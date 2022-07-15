@@ -1,14 +1,39 @@
 {
 	"outDir": "src/types",
-	"chainVersions": "kusamaVersions.json", 
-	"typesBundle": "kusama", 
+	"specVersions": "statemineVersions.jsonl", 
+	"typesBundle": "statemine", 
 	"events": [ 
-	  "balances.Transfer"
+		"Balances.Transfer",
+		"Balances.Deposit",
+		"Assets.Created",
+		"Assets.MetadataSet",
+		"Assets.MetadataCleared",
+		"Assets.Issued",
+		"Assets.Transferred",
+		"Assets.TransferredApproved",
+		"Assets.Frozen",
+		"Assets.Thawed",
+		"Assets.Burned",
+		"Assets.TeamChanged",
+		"Assets.OwnerChanged",
+		"Assets.AssetFrozen",
+		"Assets.AssetThawed",
+		"Assets.Destroyed",
+		"Uniques.Created",
+		"Uniques.Issued",
+		"Uniques.Destroyed",
+		"Uniques.Transferred",
+		"Uniques.Burned",
+		"Uniques.Frozen",
+		"Uniques.Thawed",
+		"Uniques.ClassFrozen",
+		"Uniques.ClassThawed",
+		"Uniques.MetadataSet",
+		"Uniques.MetadataCleared"
 	],
 	"calls": [ 
-	  "timestamp.set"
-	],
-	"storage": [
-	  "System.Account" 
+		"Timestamp.set",
+		"Assets.create"
 	]
   }
+

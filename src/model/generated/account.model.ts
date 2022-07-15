@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, OneToMany as OneToMany_} from "typeorm"
 import * as marshal from "./marshal"
 import {AssetBalance} from "./assetBalance.model"
 import {UniqueInstance} from "./uniqueInstance.model"
@@ -13,6 +13,7 @@ export class Account {
   @PrimaryColumn_()
   id!: string
 
+  @Index_({unique: true})
   @Column_("text", {nullable: false})
   wallet!: string
 

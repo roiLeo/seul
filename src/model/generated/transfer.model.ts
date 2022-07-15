@@ -46,6 +46,6 @@ export class Transfer {
   @Column_("text", {nullable: false})
   blockHash!: string
 
-  @Column_("integer", {nullable: false})
+  @Column_("int4", {nullable: false})
   blockNum!: number
 }
