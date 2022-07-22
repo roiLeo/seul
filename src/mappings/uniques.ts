@@ -8,9 +8,10 @@ import {
   Transfer,
   TransferType,
   UniqueTransfer,
+  Attribute,
 } from "../model/generated";
 import { EntityConstructor } from "../types";
-import { UniquesBurnedEvent, UniquesClassFrozenEvent, UniquesClassThawedEvent, UniquesCreatedEvent, UniquesDestroyedEvent, UniquesFrozenEvent, UniquesIssuedEvent, UniquesMetadataClearedEvent, UniquesMetadataSetEvent, UniquesThawedEvent, UniquesTransferredEvent } from "../types/events";
+import * as events from "../types/events";
 import { get, getOrCreate } from "./helpers/entity-utils";
 
 /**
@@ -61,7 +62,7 @@ export function getInstanceGlobalId(
 }
 
 export async function uniqueClassCreated(ctx: EventHandlerContext<Store>) {
-  let event = new UniquesCreatedEvent(ctx);
+  let event = new events.UniquesCreatedEvent(ctx);
   if (event.isV1) {
     var [classId, creator, owner] = event.asV1;
   }
@@ -77,6 +78,7 @@ export async function uniqueClassCreated(ctx: EventHandlerContext<Store>) {
   uniqueClass.creator = creator.toString();
   uniqueClass.owner = owner.toString();
   uniqueClass.status = AssetStatus.ACTIVE;
+  uniqueClass.attributes = [];
 
   await ctx.store.save(uniqueClass);
 
@@ -95,7 +97,7 @@ export async function uniqueClassCreated(ctx: EventHandlerContext<Store>) {
 }
 
 export async function uniqueClassFrozen(ctx: EventHandlerContext<Store>) {
-  let event = new UniquesClassFrozenEvent(ctx);
+  let event = new events.UniquesClassFrozenEvent(ctx);
   if (event.isV1) {
     var classId = event.asV1;
   }
@@ -124,7 +126,7 @@ export async function uniqueClassFrozen(ctx: EventHandlerContext<Store>) {
 }
 
 export async function uniqueClassThawed(ctx: EventHandlerContext<Store>) {
-  let event = new UniquesClassThawedEvent(ctx);
+  let event = new events.UniquesClassThawedEvent(ctx);
   if (event.isV1) {
     var classId = event.asV1;
   }
@@ -153,7 +155,7 @@ export async function uniqueClassThawed(ctx: EventHandlerContext<Store>) {
 }
 
 export async function uniqueClassDestroyed(ctx: EventHandlerContext<Store>) {
-  let event = new UniquesDestroyedEvent(ctx);
+  let event = new events.UniquesDestroyedEvent(ctx);
   if (event.isV1) {
     var classId = event.asV1;
   }
@@ -182,9 +184,9 @@ export async function uniqueClassDestroyed(ctx: EventHandlerContext<Store>) {
 }
 
 export async function uniqueInstanceIssued(ctx: EventHandlerContext<Store>) {
-  let event = new UniquesIssuedEvent(ctx);
+  let event = new events.UniquesIssuedEvent(ctx);
   if (event.isV1) {
-    var [classId, instanceId, owner] = event.asV1;
+    var [classId, instance, owner] = event.asV1;
   }
   else if (event.isV700) {
     var {class: classId, instance, owner} = event.asV700;
@@ -209,12 +211,13 @@ export async function uniqueInstanceIssued(ctx: EventHandlerContext<Store>) {
   await ctx.store.save(class_);
 
   const uniqueInstance = new UniqueInstance();
-  const innerInstanceid = instanceId.toString();
+  const innerInstanceid = instance.toString();
   uniqueInstance.id = getInstanceGlobalId(class_.id, innerInstanceid);
   uniqueInstance.innerID = innerInstanceid;
   uniqueInstance.owner = ownerAccount;
   uniqueInstance.uniqueClass = class_;
   uniqueInstance.status = AssetStatus.ACTIVE;
+  uniqueInstance.attributes = [];
 
   await ctx.store.save(uniqueInstance);
 
@@ -234,9 +237,9 @@ export async function uniqueInstanceIssued(ctx: EventHandlerContext<Store>) {
 }
 
 export async function uniqueInstanceTransferred(ctx: EventHandlerContext<Store>) {
-  let event = new UniquesTransferredEvent(ctx);
+  let event = new events.UniquesTransferredEvent(ctx);
   if (event.isV1) {
-    var [classId, instanceId, from, to] = event.asV1;
+    var [classId, instance, from, to] = event.asV1;
   }
   else if (event.isV700) {
     var {class: classId, instance, from, to} = event.asV700;
@@ -248,7 +251,7 @@ export async function uniqueInstanceTransferred(ctx: EventHandlerContext<Store>)
   const instanceProm = getOrDie(
     ctx.store,
     UniqueInstance,
-    getInstanceGlobalId(classId.toString(), instanceId.toString())
+    getInstanceGlobalId(classId.toString(), instance.toString())
   );
   const classProm = getOrDie(ctx.store, UniqueClass, classId.toString());
   const toAccProm = getAccountByWallet(ctx.store, to.toString());
@@ -276,9 +279,9 @@ export async function uniqueInstanceTransferred(ctx: EventHandlerContext<Store>)
 }
 
 export async function uniqueInstanceBurned(ctx: EventHandlerContext<Store>) {
-  let event = new UniquesBurnedEvent(ctx);
+  let event = new events.UniquesBurnedEvent(ctx);
   if (event.isV1) {
-    var [classId, instanceId, owner] = event.asV1;
+    var [classId, instance, owner] = event.asV1;
   }
   else if (event.isV700) {
     var {class: classId, instance, owner} = event.asV700;
@@ -289,7 +292,7 @@ export async function uniqueInstanceBurned(ctx: EventHandlerContext<Store>) {
   const instanceProm = getOrDie(
     ctx.store,
     UniqueInstance,
-    getInstanceGlobalId(classId.toString(), instanceId.toString())
+    getInstanceGlobalId(classId.toString(), instance.toString())
   );
   const classProm = getOrDie(ctx.store, UniqueClass, classId.toString());
   const [inst, class_] = await Promise.all([instanceProm, classProm]);
@@ -312,9 +315,9 @@ export async function uniqueInstanceBurned(ctx: EventHandlerContext<Store>) {
 }
 
 export async function uniqueInstanceFrozen(ctx: EventHandlerContext<Store>) {
-  let event = new UniquesFrozenEvent(ctx);
+  let event = new events.UniquesFrozenEvent(ctx);
   if (event.isV1) {
-    var [classId, instanceId] = event.asV1;
+    var [classId, instance] = event.asV1;
   }
   else if (event.isV700) {
     var {class: classId, instance} = event.asV700;
@@ -325,7 +328,7 @@ export async function uniqueInstanceFrozen(ctx: EventHandlerContext<Store>) {
   const instanceProm = getOrDie(
     ctx.store,
     UniqueInstance,
-    getInstanceGlobalId(classId.toString(), instanceId.toString())
+    getInstanceGlobalId(classId.toString(), instance.toString())
   );
   const classProm = getOrDie(ctx.store, UniqueClass, classId.toString());
   const [inst, class_] = await Promise.all([instanceProm, classProm]);
@@ -348,9 +351,9 @@ export async function uniqueInstanceFrozen(ctx: EventHandlerContext<Store>) {
 }
 
 export async function uniqueInstanceThawed(ctx: EventHandlerContext<Store>) {
-  let event = new UniquesThawedEvent(ctx);
+  let event = new events.UniquesThawedEvent(ctx);
   if (event.isV1) {
-    var [classId, instanceId] = event.asV1;
+    var [classId, instance] = event.asV1;
   }
   else if (event.isV700) {
     var {class: classId, instance} = event.asV700;
@@ -361,7 +364,7 @@ export async function uniqueInstanceThawed(ctx: EventHandlerContext<Store>) {
   const instanceProm = getOrDie(
     ctx.store,
     UniqueInstance,
-    getInstanceGlobalId(classId.toString(), instanceId.toString())
+    getInstanceGlobalId(classId.toString(), instance.toString())
   );
   const classProm = getOrDie(ctx.store, UniqueClass, classId.toString());
   const [inst, class_] = await Promise.all([instanceProm, classProm]);
@@ -383,8 +386,8 @@ export async function uniqueInstanceThawed(ctx: EventHandlerContext<Store>) {
   await ctx.store.save(transfer);
 }
 
-export async function uniquesMetadataSet(ctx: EventHandlerContext<Store>) {
-  let event = new UniquesMetadataSetEvent(ctx);
+/* export async function uniquesCollectionMetadataSet(ctx: EventHandlerContext<Store>) {
+  let event = new events.UniquesCollectionMetadataSetEvent(ctx);
   if (event.isV1) {
     var [classId, instance, data, isFrozen] = event.asV1;
   }
@@ -395,14 +398,14 @@ export async function uniquesMetadataSet(ctx: EventHandlerContext<Store>) {
     throw event.constructor.name;
   }
   const classProm = await getOrDie(ctx.store, UniqueClass, classId.toString());
-  classProm.data = hexToString(data.toString());
+  classProm.metadata = hexToString(data.toString());
   classProm.instances.push(await getOrDie(ctx.store, UniqueInstance, instance.toString())); 
   classProm.status = isFrozen ? AssetStatus.FREEZED : AssetStatus.ACTIVE;
   await ctx.store.save(classProm);
 }
 
-export async function UniquesMetadataCleared(ctx: EventHandlerContext<Store>) {
-  let event = new UniquesMetadataClearedEvent(ctx);
+export async function uniquesCollectionMetadataCleared(ctx: EventHandlerContext<Store>) {
+  let event = new events.UniquesCollectionMetadataClearedEvent(ctx);
   if (event.isV1) {
     var [classId, instance] = event.asV1;
   }
@@ -413,9 +416,112 @@ export async function UniquesMetadataCleared(ctx: EventHandlerContext<Store>) {
     throw event.constructor.name;
   }
   const classProm = await getOrDie(ctx.store, UniqueClass, classId.toString());
-  classProm.data = null;
+  classProm.metadata = null;
   await ctx.store.save(classProm);
 }
+*/
+export async function uniquesMetadataSet(ctx: EventHandlerContext<Store>) {
+  let event = new events.UniquesMetadataSetEvent(ctx);
+  if (event.isV1) {
+    var [classId, instance, data, isFrozen] = event.asV1;
+  }
+  else if (event.isV700) {
+    var {class: classId, instance, data, isFrozen} = event.asV700;
+  }
+  else {
+    throw event.constructor.name;
+  }
+  const inst = await getOrDie(ctx.store, UniqueInstance, instance.toString());
+  inst.metadata = hexToString(data.toString());
+  await ctx.store.save(inst);
+}
+
+export async function uniquesMetadataCleared(ctx: EventHandlerContext<Store>) {
+  let event = new events.UniquesMetadataClearedEvent(ctx);
+  if (event.isV1) {
+    var [classId, instance] = event.asV1;
+  }
+  else if (event.isV700) {
+    var {class: classId, instance} = event.asV700;
+  }
+  else {
+    throw event.constructor.name;
+  }
+  const inst = await getOrDie(ctx.store, UniqueInstance, instance.toString());
+  inst.metadata = null;
+  await ctx.store.save(inst);   //Can just save instance? or need to add to class
+}
+
+/* export async function uniquesAttributeSet(ctx: EventHandlerContext<Store>) {
+  let event = new events.UniquesAttributeSetEvent(ctx);
+  if (event.isV1) {
+    var [classId, instance, key, value] = event.asV1;
+  }
+  else if (event.isV700) {
+    var {class: classId, maybeInstance: instance, key, value} = event.asV700;
+  }
+  else {
+    throw event.constructor.name;
+  }
+  let classOrInstance = instance ? await getOrDie(ctx.store, UniqueInstance, instance.toString()) :
+                                     await getOrDie(ctx.store, UniqueClass, classId.toString());
+  let attrIndex = classOrInstance.attributes?.findIndex(attr => attr.key == key.toString());
+  if (attrIndex !== -1) classOrInstance.attributes?[attrIndex].value = value.toString();
+  else classOrInstance.attributes?.push( {key: key.toString(), value: value.toString()} );
+  await ctx.store.save(classOrInstance);
+} */
+
+export async function uniquesAttributeCleared(ctx: EventHandlerContext<Store>) {
+  let event = new events.UniquesAttributeClearedEvent(ctx);
+  if (event.isV1) {
+    var [classId, instance, key] = event.asV1;
+  }
+  else if (event.isV700) {
+    var {class: classId, maybeInstance: instance, key} = event.asV700;
+  }
+  else {
+    throw event.constructor.name;
+  }
+  let classOrInstance = instance ? await getOrDie(ctx.store, UniqueInstance, instance.toString()) :
+                                     await getOrDie(ctx.store, UniqueClass, classId.toString());
+  classOrInstance.attributes?.filter(attr => attr.key != key.toString());
+  await ctx.store.save(classOrInstance);
+}
+
+export async function uniquesTeamChanged(ctx: EventHandlerContext<Store>) {
+  let event = new events.UniquesTeamChangedEvent(ctx);
+  if (event.isV1) {
+    var [classId, issuer, admin, freezer] = event.asV1;
+  }
+  else if (event.isV700) {
+    var {class: classId, issuer, admin, freezer} = event.asV700;
+  }
+  else {
+    throw event.constructor.name;
+  }
+  let instanceClass = await getOrDie(ctx.store, UniqueClass, classId.toString());
+  issuer && (instanceClass.issuer = issuer.toString());
+  admin && (instanceClass.admin = admin.toString());
+  freezer && (instanceClass.freezer = freezer.toString());
+  await ctx.store.save(instanceClass);
+}
+
+export async function uniquesOwnerChanged(ctx: EventHandlerContext<Store>) {
+  let event = new events.UniquesOwnerChangedEvent(ctx);
+  if (event.isV1) {
+    var [classId, newOwner] = event.asV1;
+  }
+  else if (event.isV700) {
+    var {class: classId, newOwner} = event.asV700;
+  }
+  else {
+    throw event.constructor.name;
+  }
+  let instanceClass = await getOrDie(ctx.store, UniqueClass, classId.toString());
+  newOwner && (instanceClass.owner = newOwner.toString());
+  await ctx.store.save(instanceClass);
+}
+
 
 function hexToString(text: string) {
 	return text.startsWith('0x') ? Buffer.from(text.replace(/^0x/, ''), 'hex').toString() : text 

@@ -1,7 +1,5 @@
 import assert from 'assert'
 import {Chain, ChainContext, EventContext, Event, Result} from './support'
-import * as v1 from './v1'
-import * as v700 from './v700'
 
 export class AssetsAssetFrozenEvent {
   private readonly _chain: Chain
@@ -26,7 +24,7 @@ export class AssetsAssetFrozenEvent {
   /**
    *  Some asset `asset_id` was frozen. \[asset_id\]
    */
-  get asV1(): v1.AssetId {
+  get asV1(): number {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -70,7 +68,7 @@ export class AssetsAssetThawedEvent {
   /**
    *  Some asset `asset_id` was thawed. \[asset_id\]
    */
-  get asV1(): v1.AssetId {
+  get asV1(): number {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -114,7 +112,7 @@ export class AssetsBurnedEvent {
   /**
    *  Some assets were destroyed. \[asset_id, owner, balance\]
    */
-  get asV1(): [v1.AssetId, v1.AccountId, v1.TAssetBalance] {
+  get asV1(): [number, Uint8Array, bigint] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -129,7 +127,7 @@ export class AssetsBurnedEvent {
   /**
    * Some assets were destroyed.
    */
-  get asV700(): {assetId: number, owner: v700.AccountId32, balance: bigint} {
+  get asV700(): {assetId: number, owner: Uint8Array, balance: bigint} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -158,7 +156,7 @@ export class AssetsCreatedEvent {
   /**
    *  Some asset class was created. \[asset_id, creator, owner\]
    */
-  get asV1(): [v1.AssetId, v1.AccountId, v1.AccountId] {
+  get asV1(): [number, Uint8Array, Uint8Array] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -173,7 +171,7 @@ export class AssetsCreatedEvent {
   /**
    * Some asset class was created.
    */
-  get asV700(): {assetId: number, creator: v700.AccountId32, owner: v700.AccountId32} {
+  get asV700(): {assetId: number, creator: Uint8Array, owner: Uint8Array} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -202,7 +200,7 @@ export class AssetsDestroyedEvent {
   /**
    *  An asset class was destroyed.
    */
-  get asV1(): v1.AssetId {
+  get asV1(): number {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -246,7 +244,7 @@ export class AssetsFrozenEvent {
   /**
    *  Some account `who` was frozen. \[asset_id, who\]
    */
-  get asV1(): [v1.AssetId, v1.AccountId] {
+  get asV1(): [number, Uint8Array] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -261,7 +259,7 @@ export class AssetsFrozenEvent {
   /**
    * Some account `who` was frozen.
    */
-  get asV700(): {assetId: number, who: v700.AccountId32} {
+  get asV700(): {assetId: number, who: Uint8Array} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -290,7 +288,7 @@ export class AssetsIssuedEvent {
   /**
    *  Some assets were issued. \[asset_id, owner, total_supply\]
    */
-  get asV1(): [v1.AssetId, v1.AccountId, v1.TAssetBalance] {
+  get asV1(): [number, Uint8Array, bigint] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -305,7 +303,7 @@ export class AssetsIssuedEvent {
   /**
    * Some assets were issued.
    */
-  get asV700(): {assetId: number, owner: v700.AccountId32, totalSupply: bigint} {
+  get asV700(): {assetId: number, owner: Uint8Array, totalSupply: bigint} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -334,7 +332,7 @@ export class AssetsMetadataClearedEvent {
   /**
    *  Metadata has been cleared for an asset. \[asset_id\]
    */
-  get asV1(): v1.AssetId {
+  get asV1(): number {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -378,7 +376,7 @@ export class AssetsMetadataSetEvent {
   /**
    *  New metadata has been set for an asset. \[asset_id, name, symbol, decimals, is_frozen\]
    */
-  get asV1(): [v1.AssetId, Uint8Array, Uint8Array, number, boolean] {
+  get asV1(): [number, Uint8Array, Uint8Array, number, boolean] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -422,7 +420,7 @@ export class AssetsOwnerChangedEvent {
   /**
    *  The owner changed \[asset_id, owner\]
    */
-  get asV1(): [v1.AssetId, v1.AccountId] {
+  get asV1(): [number, Uint8Array] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -437,7 +435,7 @@ export class AssetsOwnerChangedEvent {
   /**
    * The owner changed.
    */
-  get asV700(): {assetId: number, owner: v700.AccountId32} {
+  get asV700(): {assetId: number, owner: Uint8Array} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -466,7 +464,7 @@ export class AssetsTeamChangedEvent {
   /**
    *  The management team changed \[asset_id, issuer, admin, freezer\]
    */
-  get asV1(): [v1.AssetId, v1.AccountId, v1.AccountId, v1.AccountId] {
+  get asV1(): [number, Uint8Array, Uint8Array, Uint8Array] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -481,7 +479,7 @@ export class AssetsTeamChangedEvent {
   /**
    * The management team changed.
    */
-  get asV700(): {assetId: number, issuer: v700.AccountId32, admin: v700.AccountId32, freezer: v700.AccountId32} {
+  get asV700(): {assetId: number, issuer: Uint8Array, admin: Uint8Array, freezer: Uint8Array} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -510,7 +508,7 @@ export class AssetsThawedEvent {
   /**
    *  Some account `who` was thawed. \[asset_id, who\]
    */
-  get asV1(): [v1.AssetId, v1.AccountId] {
+  get asV1(): [number, Uint8Array] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -525,7 +523,7 @@ export class AssetsThawedEvent {
   /**
    * Some account `who` was thawed.
    */
-  get asV700(): {assetId: number, who: v700.AccountId32} {
+  get asV700(): {assetId: number, who: Uint8Array} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -554,7 +552,7 @@ export class AssetsTransferredEvent {
   /**
    *  Some assets were transferred. \[asset_id, from, to, amount\]
    */
-  get asV1(): [v1.AssetId, v1.AccountId, v1.AccountId, v1.TAssetBalance] {
+  get asV1(): [number, Uint8Array, Uint8Array, bigint] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -569,7 +567,7 @@ export class AssetsTransferredEvent {
   /**
    * Some assets were transferred.
    */
-  get asV700(): {assetId: number, from: v700.AccountId32, to: v700.AccountId32, amount: bigint} {
+  get asV700(): {assetId: number, from: Uint8Array, to: Uint8Array, amount: bigint} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -602,7 +600,7 @@ export class AssetsTransferredApprovedEvent {
    *  the approved `delegate`.
    *  \[id, owner, delegate, destination\]
    */
-  get asV1(): [v1.AssetId, v1.AccountId, v1.AccountId, v1.AccountId, v1.TAssetBalance] {
+  get asV1(): [number, Uint8Array, Uint8Array, Uint8Array, bigint] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -619,7 +617,7 @@ export class AssetsTransferredApprovedEvent {
    * An `amount` was transferred in its entirety from `owner` to `destination` by
    * the approved `delegate`.
    */
-  get asV700(): {assetId: number, owner: v700.AccountId32, delegate: v700.AccountId32, destination: v700.AccountId32, amount: bigint} {
+  get asV700(): {assetId: number, owner: Uint8Array, delegate: Uint8Array, destination: Uint8Array, amount: bigint} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -648,7 +646,7 @@ export class BalancesDepositEvent {
   /**
    *  Some amount was deposited (e.g. for transaction fees). \[who, deposit\]
    */
-  get asV1(): [v1.AccountId, v1.Balance] {
+  get asV1(): [Uint8Array, bigint] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -663,7 +661,7 @@ export class BalancesDepositEvent {
   /**
    * Some amount was deposited (e.g. for transaction fees).
    */
-  get asV700(): {who: v700.AccountId32, amount: bigint} {
+  get asV700(): {who: Uint8Array, amount: bigint} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -692,7 +690,7 @@ export class BalancesTransferEvent {
   /**
    *  Transfer succeeded. \[from, to, value\]
    */
-  get asV1(): [v1.AccountId, v1.AccountId, v1.Balance] {
+  get asV1(): [Uint8Array, Uint8Array, bigint] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -707,7 +705,99 @@ export class BalancesTransferEvent {
   /**
    * Transfer succeeded.
    */
-  get asV700(): {from: v700.AccountId32, to: v700.AccountId32, amount: bigint} {
+  get asV700(): {from: Uint8Array, to: Uint8Array, amount: bigint} {
+    assert(this.isV700)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
+export class UniquesAttributeClearedEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'Uniques.AttributeCleared')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   *  Attribute metadata has been cleared for an asset class or instance.
+   *  \[ class, maybe_instance, key, maybe_value \]
+   */
+  get isV1(): boolean {
+    return this._chain.getEventHash('Uniques.AttributeCleared') === '885b4dbb6c48840d1cb04f9f8a73f65455ff8e630c9692e7b8efbb5abf341a92'
+  }
+
+  /**
+   *  Attribute metadata has been cleared for an asset class or instance.
+   *  \[ class, maybe_instance, key, maybe_value \]
+   */
+  get asV1(): [number, (number | undefined), Uint8Array] {
+    assert(this.isV1)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * Attribute metadata has been cleared for an asset class or instance.
+   */
+  get isV700(): boolean {
+    return this._chain.getEventHash('Uniques.AttributeCleared') === '91aa106b700026eb59ef1d86cbd22766539a996d1d1d5cb5dbbdc18439ff1283'
+  }
+
+  /**
+   * Attribute metadata has been cleared for an asset class or instance.
+   */
+  get asV700(): {class: number, maybeInstance: (number | undefined), key: Uint8Array} {
+    assert(this.isV700)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
+export class UniquesAttributeSetEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'Uniques.AttributeSet')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   *  New attribute metadata has been set for an asset class or instance.
+   *  \[ class, maybe_instance, key, value \]
+   */
+  get isV1(): boolean {
+    return this._chain.getEventHash('Uniques.AttributeSet') === '135c19d2cf1f530340d3fe938fdcce6ca358d729cfc69ce595cc57b640136a76'
+  }
+
+  /**
+   *  New attribute metadata has been set for an asset class or instance.
+   *  \[ class, maybe_instance, key, value \]
+   */
+  get asV1(): [number, (number | undefined), Uint8Array, Uint8Array] {
+    assert(this.isV1)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * New attribute metadata has been set for an asset class or instance.
+   */
+  get isV700(): boolean {
+    return this._chain.getEventHash('Uniques.AttributeSet') === '6ae49a979267c094bc35bda051f5467e62472724b598a2f5ee5720a5111b8623'
+  }
+
+  /**
+   * New attribute metadata has been set for an asset class or instance.
+   */
+  get asV700(): {class: number, maybeInstance: (number | undefined), key: Uint8Array, value: Uint8Array} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -736,7 +826,7 @@ export class UniquesBurnedEvent {
   /**
    *  An asset `instance` was destroyed. \[ class, instance, owner \]
    */
-  get asV1(): [v1.ClassId, v1.InstanceId, v1.AccountId] {
+  get asV1(): [number, number, Uint8Array] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -751,7 +841,7 @@ export class UniquesBurnedEvent {
   /**
    * An asset `instance` was destroyed.
    */
-  get asV700(): {class: number, instance: number, owner: v700.AccountId32} {
+  get asV700(): {class: number, instance: number, owner: Uint8Array} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -780,7 +870,7 @@ export class UniquesClassFrozenEvent {
   /**
    *  Some asset `class` was frozen. \[ class \]
    */
-  get asV1(): v1.ClassId {
+  get asV1(): number {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -824,7 +914,7 @@ export class UniquesClassThawedEvent {
   /**
    *  Some asset `class` was thawed. \[ class \]
    */
-  get asV1(): v1.ClassId {
+  get asV1(): number {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -868,7 +958,7 @@ export class UniquesCreatedEvent {
   /**
    *  An asset class was created. \[ class, creator, owner \]
    */
-  get asV1(): [v1.ClassId, v1.AccountId, v1.AccountId] {
+  get asV1(): [number, Uint8Array, Uint8Array] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -883,7 +973,7 @@ export class UniquesCreatedEvent {
   /**
    * An asset class was created.
    */
-  get asV700(): {class: number, creator: v700.AccountId32, owner: v700.AccountId32} {
+  get asV700(): {class: number, creator: Uint8Array, owner: Uint8Array} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -912,7 +1002,7 @@ export class UniquesDestroyedEvent {
   /**
    *  An asset `class` was destroyed. \[ class \]
    */
-  get asV1(): v1.ClassId {
+  get asV1(): number {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -956,7 +1046,7 @@ export class UniquesFrozenEvent {
   /**
    *  Some asset `instance` was frozen. \[ class, instance \]
    */
-  get asV1(): [v1.ClassId, v1.InstanceId] {
+  get asV1(): [number, number] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -1000,7 +1090,7 @@ export class UniquesIssuedEvent {
   /**
    *  An asset `instace` was issued. \[ class, instance, owner \]
    */
-  get asV1(): [v1.ClassId, v1.InstanceId, v1.AccountId] {
+  get asV1(): [number, number, Uint8Array] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -1015,7 +1105,7 @@ export class UniquesIssuedEvent {
   /**
    * An asset `instance` was issued.
    */
-  get asV700(): {class: number, instance: number, owner: v700.AccountId32} {
+  get asV700(): {class: number, instance: number, owner: Uint8Array} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -1044,7 +1134,7 @@ export class UniquesMetadataClearedEvent {
   /**
    *  Metadata has been cleared for an asset instance. \[ class, instance \]
    */
-  get asV1(): [v1.ClassId, v1.InstanceId] {
+  get asV1(): [number, number] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -1090,7 +1180,7 @@ export class UniquesMetadataSetEvent {
    *  New metadata has been set for an asset instance.
    *  \[ class, instance, data, is_frozen \]
    */
-  get asV1(): [v1.ClassId, v1.InstanceId, Uint8Array, boolean] {
+  get asV1(): [number, number, Uint8Array, boolean] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -1106,6 +1196,94 @@ export class UniquesMetadataSetEvent {
    * New metadata has been set for an asset instance.
    */
   get asV700(): {class: number, instance: number, data: Uint8Array, isFrozen: boolean} {
+    assert(this.isV700)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
+export class UniquesOwnerChangedEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'Uniques.OwnerChanged')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   *  The owner changed \[ class, new_owner \]
+   */
+  get isV1(): boolean {
+    return this._chain.getEventHash('Uniques.OwnerChanged') === '0379562584d6426ccff49705dfa9dba95ad94215b772fd97d0ad0c4ca0001c12'
+  }
+
+  /**
+   *  The owner changed \[ class, new_owner \]
+   */
+  get asV1(): [number, Uint8Array] {
+    assert(this.isV1)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * The owner changed.
+   */
+  get isV700(): boolean {
+    return this._chain.getEventHash('Uniques.OwnerChanged') === '7f21331ba73970553e198c5598e55e9857317b38adaa7f293e914882bdd7385c'
+  }
+
+  /**
+   * The owner changed.
+   */
+  get asV700(): {class: number, newOwner: Uint8Array} {
+    assert(this.isV700)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
+export class UniquesTeamChangedEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'Uniques.TeamChanged')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   *  The management team changed \[ class, issuer, admin, freezer \]
+   */
+  get isV1(): boolean {
+    return this._chain.getEventHash('Uniques.TeamChanged') === '608cf8b84887966db26c958a6b826fd41d8e098263ce7eaae9a421f1f8b1bd56'
+  }
+
+  /**
+   *  The management team changed \[ class, issuer, admin, freezer \]
+   */
+  get asV1(): [number, Uint8Array, Uint8Array, Uint8Array] {
+    assert(this.isV1)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * The management team changed.
+   */
+  get isV700(): boolean {
+    return this._chain.getEventHash('Uniques.TeamChanged') === 'ed55b7c512c680f9a9b8f35a0e603e101cd439e8b1c07373e1b6b2ca40d032f7'
+  }
+
+  /**
+   * The management team changed.
+   */
+  get asV700(): {class: number, issuer: Uint8Array, admin: Uint8Array, freezer: Uint8Array} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -1134,7 +1312,7 @@ export class UniquesThawedEvent {
   /**
    *  Some asset `instance` was thawed. \[ class, instance \]
    */
-  get asV1(): [v1.ClassId, v1.InstanceId] {
+  get asV1(): [number, number] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -1178,7 +1356,7 @@ export class UniquesTransferredEvent {
   /**
    *  An asset `instace` was transferred. \[ class, instance, from, to \]
    */
-  get asV1(): [v1.ClassId, v1.InstanceId, v1.AccountId, v1.AccountId] {
+  get asV1(): [number, number, Uint8Array, Uint8Array] {
     assert(this.isV1)
     return this._chain.decodeEvent(this.event)
   }
@@ -1193,7 +1371,7 @@ export class UniquesTransferredEvent {
   /**
    * An asset `instance` was transferred.
    */
-  get asV700(): {class: number, instance: number, from: v700.AccountId32, to: v700.AccountId32} {
+  get asV700(): {class: number, instance: number, from: Uint8Array, to: Uint8Array} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }

@@ -24,12 +24,16 @@
 		"Uniques.Destroyed",
 		"Uniques.Transferred",
 		"Uniques.Burned",
+		"Uniques.TeamChanged",
+		"Uniques.OwnerChanged",
 		"Uniques.Frozen",
 		"Uniques.Thawed",
 		"Uniques.ClassFrozen",
 		"Uniques.ClassThawed",
 		"Uniques.MetadataSet",
-		"Uniques.MetadataCleared"
+		"Uniques.MetadataCleared",
+		"Uniques.AttributeSet",
+		"Uniques.AttributeCleared"
 	],
 	"calls": [ 
 		"Timestamp.set",

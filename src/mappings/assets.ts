@@ -11,7 +11,7 @@ import { get, getOrCreate } from "./helpers/entity-utils";
 import { EventHandlerContext } from "@subsquid/substrate-processor";
 import { Store } from "@subsquid/typeorm-store/lib/store";
 import { AssetsCreateCall } from "../types/calls";
-import { AssetsAssetFrozenEvent, AssetsAssetThawedEvent, AssetsBurnedEvent, AssetsCreatedEvent, AssetsDestroyedEvent, AssetsFrozenEvent, AssetsIssuedEvent, AssetsMetadataClearedEvent, AssetsMetadataSetEvent, AssetsOwnerChangedEvent, AssetsTeamChangedEvent, AssetsThawedEvent, AssetsTransferredApprovedEvent, AssetsTransferredEvent } from "../types/events";
+import * as events from "../types/events";
 import  assert  from "assert"
 
 /**
@@ -89,27 +89,8 @@ export async function changeAssetBalance(ctx: EventHandlerContext<Store, {event:
   return [asset, account, assetBalance];
 }
 
-
-/* export async function assetCreated({
-  store,
-  event,
-}: EventContext & StoreContext): Promise<void> {
-  const [assetId, creator, owner] = new Assets.CreatedEvent(event).params;
-  const asset = new Asset();
-
-  asset.id = assetId.toString();
-  asset.creator = creator.toString();
-  asset.owner = owner.toString();
-  asset.freezer = asset.admin = asset.owner;
-  asset.status = AssetStatus.ACTIVE;
-  asset.minBalance = 0n;  //????
-  asset.totalSupply = 0n;
-
-  await store.save(asset);
-} */
-
 export async function assetCreated(ctx: EventHandlerContext<Store, {event: true}>) {
-  let event = new AssetsCreatedEvent(ctx);
+  let event = new events.AssetsCreatedEvent(ctx);
   if (event.isV1) {
     var [assetId, creator, owner] = event.asV1;
   }
@@ -135,7 +116,7 @@ export async function assetCreated(ctx: EventHandlerContext<Store, {event: true}
 }
 
 export async function assetOwnerChanged(ctx: EventHandlerContext<Store, {event: {args: true}}>) {
-  let event = new AssetsOwnerChangedEvent(ctx);
+  let event = new events.AssetsOwnerChangedEvent(ctx);
   if (event.isV1) {
     var [assetId, owner] = event.asV1;
   }
@@ -151,7 +132,7 @@ export async function assetOwnerChanged(ctx: EventHandlerContext<Store, {event: 
 }
 
 export async function assetTeamChanged(ctx: EventHandlerContext<Store, {event: {args: true}}>) {
-  let event = new AssetsTeamChangedEvent(ctx);
+  let event = new events.AssetsTeamChangedEvent(ctx);
   if (event.isV1) {
     var [assetId, issuer, admin, freezer] = event.asV1;
   }
@@ -171,7 +152,7 @@ export async function assetTeamChanged(ctx: EventHandlerContext<Store, {event: {
 }
 
 export async function assetFrozen(ctx: EventHandlerContext<Store, {event: {args: true}}>) {
-  let event = new AssetsAssetFrozenEvent(ctx);
+  let event = new events.AssetsAssetFrozenEvent(ctx);
   if (event.isV1) {
     var assetId = event.asV1;
   }
@@ -189,7 +170,7 @@ export async function assetFrozen(ctx: EventHandlerContext<Store, {event: {args:
 }
 
 export async function assetThawed(ctx: EventHandlerContext<Store, {event: {args: true}}>) {
-  let event = new AssetsAssetThawedEvent(ctx);  //TODO: CHECK VERSIONs
+  let event = new events.AssetsAssetThawedEvent(ctx);  //TODO: CHECK VERSIONs
   if (event.isV1) {
     var assetId = event.asV1;
   }
@@ -207,7 +188,7 @@ export async function assetThawed(ctx: EventHandlerContext<Store, {event: {args:
 }
 
 export async function assetDestroyed(ctx: EventHandlerContext<Store, {event: {args: true}}>) {
-  let event = new AssetsDestroyedEvent(ctx);
+  let event = new events.AssetsDestroyedEvent(ctx);
   if (event.isV1) {
     var assetId = event.asV1;
   }
@@ -225,7 +206,7 @@ export async function assetDestroyed(ctx: EventHandlerContext<Store, {event: {ar
 }
 
 export async function assetMetadataSet(ctx: EventHandlerContext<Store, {event: {args: true}}>) {
-  let event = new AssetsMetadataSetEvent(ctx);
+  let event = new events.AssetsMetadataSetEvent(ctx);
   if (event.isV1) {
     var [assetId, name, symbol, decimals, isFrozen] = event.asV1;
   }
@@ -244,7 +225,7 @@ export async function assetMetadataSet(ctx: EventHandlerContext<Store, {event: {
 }
 
 export async function assetMetadataCleared(ctx: EventHandlerContext<Store, {event: {args: true}}>) {
-  let event = new AssetsMetadataClearedEvent(ctx);
+  let event = new events.AssetsMetadataClearedEvent(ctx);
   if (event.isV1) {
     var assetId = event.asV1;
   }
@@ -262,7 +243,7 @@ export async function assetMetadataCleared(ctx: EventHandlerContext<Store, {even
 }
 
 export async function assetIssued(ctx: EventHandlerContext<Store>) {
-  let event = new AssetsIssuedEvent(ctx);
+  let event = new events.AssetsIssuedEvent(ctx);
   if (event.isV1) {
     var [assetId, owner, totalSupply] = event.asV1;
   }
@@ -297,7 +278,7 @@ export async function assetIssued(ctx: EventHandlerContext<Store>) {
 }
 
 export async function assetTransfer(ctx: EventHandlerContext<Store>) {
-  let event = new AssetsTransferredEvent(ctx);
+  let event = new events.AssetsTransferredEvent(ctx);
   if (event.isV1) {
     var [assetId, from, to, amount] = event.asV1;
   }
@@ -332,7 +313,7 @@ export async function assetTransfer(ctx: EventHandlerContext<Store>) {
 }
 
 export async function assetBalanceBurned(ctx: EventHandlerContext<Store>) {
-  let event = new AssetsBurnedEvent(ctx);
+  let event = new events.AssetsBurnedEvent(ctx);
   if (event.isV1) {
     var [assetId, owner, balance] = event.asV1;
   }
@@ -364,7 +345,7 @@ export async function assetBalanceBurned(ctx: EventHandlerContext<Store>) {
 }
 
 export async function assetTransferredApproved(ctx: EventHandlerContext<Store>) {
-  let event = new AssetsTransferredApprovedEvent(ctx);
+  let event = new events.AssetsTransferredApprovedEvent(ctx);
   if (event.isV1) {
     var [assetId, owner, delegate, destination, amount] = event.asV1;
   }
@@ -400,7 +381,7 @@ export async function assetTransferredApproved(ctx: EventHandlerContext<Store>) 
 }
 
 export async function assetAccountFrozen(ctx: EventHandlerContext<Store>) {
-  let event = new AssetsFrozenEvent(ctx);
+  let event = new events.AssetsFrozenEvent(ctx);
   if (event.isV1) {
     var [assetId, who] = event.asV1;
   }
@@ -433,7 +414,7 @@ export async function assetAccountFrozen(ctx: EventHandlerContext<Store>) {
 }
 
 export async function assetBalanceThawed(ctx: EventHandlerContext<Store>) {
-  let event = new AssetsThawedEvent(ctx);
+  let event = new events.AssetsThawedEvent(ctx);
   if (event.isV1) {
     var [assetId, who] = event.asV1;
   }

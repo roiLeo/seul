@@ -4,7 +4,7 @@ export type MultiAddress = MultiAddress_Id | MultiAddress_Index | MultiAddress_R
 
 export interface MultiAddress_Id {
   __kind: 'Id'
-  value: AccountId32
+  value: Uint8Array
 }
 
 export interface MultiAddress_Index {
@@ -26,5 +26,3 @@ export interface MultiAddress_Address20 {
   __kind: 'Address20'
   value: Uint8Array
 }
-
-export type AccountId32 = Uint8Array

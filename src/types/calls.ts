@@ -62,7 +62,7 @@ export class AssetsCreateCall {
    * 
    *  Weight: `O(1)`
    */
-  get asV1(): {id: number, admin: v1.LookupSource, minBalance: v1.TAssetBalance} {
+  get asV1(): {id: number, admin: v1.LookupSource, minBalance: bigint} {
     assert(this.isV1)
     return this._chain.decodeCall(this.call)
   }

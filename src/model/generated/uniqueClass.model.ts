@@ -2,6 +2,7 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, O
 import * as marshal from "./marshal"
 import {AssetStatus} from "./_assetStatus"
 import {UniqueInstance} from "./uniqueInstance.model"
+import {Attribute} from "./_attribute"
 
 @Entity_()
 export class UniqueClass {
@@ -40,5 +41,8 @@ export class UniqueClass {
   instances!: UniqueInstance[]
 
   @Column_("text", {nullable: true})
-  data!: string | undefined | null
+  metadata!: string | undefined | null
+
+  @Column_("jsonb", {transformer: {to: obj => obj == null ? undefined : obj.map((val: any) => val.toJSON()), from: obj => obj == null ? undefined : marshal.fromList(obj, val => new Attribute(undefined, marshal.nonNull(val)))}, nullable: true})
+  attributes!: (Attribute)[] | undefined | null
 }

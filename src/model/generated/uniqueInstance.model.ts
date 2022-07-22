@@ -4,6 +4,7 @@ import {UniqueClass} from "./uniqueClass.model"
 import {Account} from "./account.model"
 import {AssetStatus} from "./_assetStatus"
 import {UniqueTransfer} from "./uniqueTransfer.model"
+import {Attribute} from "./_attribute"
 
 @Entity_()
 export class UniqueInstance {
@@ -33,4 +34,10 @@ export class UniqueInstance {
 
   @OneToMany_(() => UniqueTransfer, e => e.uniqueInstance)
   transfers!: UniqueTransfer[]
+
+  @Column_("text", {nullable: true})
+  metadata!: string | undefined | null
+
+  @Column_("jsonb", {transformer: {to: obj => obj == null ? undefined : obj.map((val: any) => val.toJSON()), from: obj => obj == null ? undefined : marshal.fromList(obj, val => new Attribute(undefined, marshal.nonNull(val)))}, nullable: true})
+  attributes!: (Attribute)[] | undefined | null
 }

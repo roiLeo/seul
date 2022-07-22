@@ -114,7 +114,8 @@ type UniqueClass @entity {
   name: String
   status: AssetStatus!
   instances: [UniqueInstance!] @derivedFrom(field: "uniqueClass")
-  data: String
+  metadata: String
+  attributes: [Attribute!]
 }
 
 type UniqueInstance @entity {
@@ -125,5 +126,12 @@ type UniqueInstance @entity {
   status: AssetStatus!
   deposit: BigInt
   transfers: [UniqueTransfer!] @derivedFrom(field: "uniqueInstance")
+  metadata: String
+  attributes: [Attribute!]
+}
+
+type Attribute @jsonField {
+  key: String
+  value: String!
 }
 
