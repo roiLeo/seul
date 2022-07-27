@@ -755,6 +755,21 @@ export class UniquesAttributeClearedEvent {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
+
+  /**
+   * Attribute metadata has been cleared for a `collection` or `item`.
+   */
+  get isV9230(): boolean {
+    return this._chain.getEventHash('Uniques.AttributeCleared') === 'c330ddd00fb87b92c796bc29cff6edf2ce546dd8eb98420ac23c5cbe7b0e11d1'
+  }
+
+  /**
+   * Attribute metadata has been cleared for a `collection` or `item`.
+   */
+  get asV9230(): {collection: number, maybeItem: (number | undefined), key: Uint8Array} {
+    assert(this.isV9230)
+    return this._chain.decodeEvent(this.event)
+  }
 }
 
 export class UniquesAttributeSetEvent {
@@ -801,6 +816,21 @@ export class UniquesAttributeSetEvent {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
+
+  /**
+   * New attribute metadata has been set for a `collection` or `item`.
+   */
+  get isV9230(): boolean {
+    return this._chain.getEventHash('Uniques.AttributeSet') === 'b7e65dbf62f10e9415ffa560bff4954ffeb28994c9cf350ecd59fe98850d8783'
+  }
+
+  /**
+   * New attribute metadata has been set for a `collection` or `item`.
+   */
+  get asV9230(): {collection: number, maybeItem: (number | undefined), key: Uint8Array, value: Uint8Array} {
+    assert(this.isV9230)
+    return this._chain.decodeEvent(this.event)
+  }
 }
 
 export class UniquesBurnedEvent {
@@ -845,6 +875,21 @@ export class UniquesBurnedEvent {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
+
+  /**
+   * An `item` was destroyed.
+   */
+  get isV9230(): boolean {
+    return this._chain.getEventHash('Uniques.Burned') === '281c96f4233cbe042ed549cfca1fafa833d625f8d832ed29682ac34cdceb017d'
+  }
+
+  /**
+   * An `item` was destroyed.
+   */
+  get asV9230(): {collection: number, item: number, owner: Uint8Array} {
+    assert(this.isV9230)
+    return this._chain.decodeEvent(this.event)
+  }
 }
 
 export class UniquesClassFrozenEvent {
@@ -886,6 +931,94 @@ export class UniquesClassFrozenEvent {
    * Some asset `class` was frozen.
    */
   get asV700(): {class: number} {
+    assert(this.isV700)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
+export class UniquesClassMetadataClearedEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'Uniques.ClassMetadataCleared')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   *  Metadata has been cleared for an asset class. \[ class \]
+   */
+  get isV1(): boolean {
+    return this._chain.getEventHash('Uniques.ClassMetadataCleared') === '0a0f30b1ade5af5fade6413c605719d59be71340cf4884f65ee9858eb1c38f6c'
+  }
+
+  /**
+   *  Metadata has been cleared for an asset class. \[ class \]
+   */
+  get asV1(): number {
+    assert(this.isV1)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * Metadata has been cleared for an asset class.
+   */
+  get isV700(): boolean {
+    return this._chain.getEventHash('Uniques.ClassMetadataCleared') === '4f045c4df2d4b9045175427f6f6aa548cd3ad56207f700b68254d3b77d944310'
+  }
+
+  /**
+   * Metadata has been cleared for an asset class.
+   */
+  get asV700(): {class: number} {
+    assert(this.isV700)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
+export class UniquesClassMetadataSetEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'Uniques.ClassMetadataSet')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   *  New metadata has been set for an asset class. \[ class, data, is_frozen \]
+   */
+  get isV1(): boolean {
+    return this._chain.getEventHash('Uniques.ClassMetadataSet') === '5792f3fb3e6c02cd51090283e81fd6d6cf13fe8a50876dcc428a6b9314aa3f72'
+  }
+
+  /**
+   *  New metadata has been set for an asset class. \[ class, data, is_frozen \]
+   */
+  get asV1(): [number, Uint8Array, boolean] {
+    assert(this.isV1)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * New metadata has been set for an asset class.
+   */
+  get isV700(): boolean {
+    return this._chain.getEventHash('Uniques.ClassMetadataSet') === '151c432def6b2dc27880b815773b729a1ceb58295a326de4c16e57901c2a9476'
+  }
+
+  /**
+   * New metadata has been set for an asset class.
+   */
+  get asV700(): {class: number, data: Uint8Array, isFrozen: boolean} {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
@@ -935,6 +1068,64 @@ export class UniquesClassThawedEvent {
   }
 }
 
+export class UniquesCollectionMetadataClearedEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'Uniques.CollectionMetadataCleared')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   * Metadata has been cleared for a `collection`.
+   */
+  get isV9230(): boolean {
+    return this._chain.getEventHash('Uniques.CollectionMetadataCleared') === 'a84ae2f0e555d689a7b5b0ee2914bd693902b07afc4f268377240f6ac92495cb'
+  }
+
+  /**
+   * Metadata has been cleared for a `collection`.
+   */
+  get asV9230(): {collection: number} {
+    assert(this.isV9230)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
+export class UniquesCollectionMetadataSetEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'Uniques.CollectionMetadataSet')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   * New metadata has been set for a `collection`.
+   */
+  get isV9230(): boolean {
+    return this._chain.getEventHash('Uniques.CollectionMetadataSet') === '63ef75086da73b45ed287cac6640abbebd40222433fb8fae9e4fa1bfa173afc2'
+  }
+
+  /**
+   * New metadata has been set for a `collection`.
+   */
+  get asV9230(): {collection: number, data: Uint8Array, isFrozen: boolean} {
+    assert(this.isV9230)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
 export class UniquesCreatedEvent {
   private readonly _chain: Chain
   private readonly event: Event
@@ -975,6 +1166,21 @@ export class UniquesCreatedEvent {
    */
   get asV700(): {class: number, creator: Uint8Array, owner: Uint8Array} {
     assert(this.isV700)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * A `collection` was created.
+   */
+  get isV9230(): boolean {
+    return this._chain.getEventHash('Uniques.Created') === 'a5c293082b1f3ffb16eaecc5b8d430ca1bb8c7bd090079ebcefcbf303cbfec61'
+  }
+
+  /**
+   * A `collection` was created.
+   */
+  get asV9230(): {collection: number, creator: Uint8Array, owner: Uint8Array} {
+    assert(this.isV9230)
     return this._chain.decodeEvent(this.event)
   }
 }
@@ -1021,6 +1227,21 @@ export class UniquesDestroyedEvent {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
+
+  /**
+   * A `collection` was destroyed.
+   */
+  get isV9230(): boolean {
+    return this._chain.getEventHash('Uniques.Destroyed') === 'a84ae2f0e555d689a7b5b0ee2914bd693902b07afc4f268377240f6ac92495cb'
+  }
+
+  /**
+   * A `collection` was destroyed.
+   */
+  get asV9230(): {collection: number} {
+    assert(this.isV9230)
+    return this._chain.decodeEvent(this.event)
+  }
 }
 
 export class UniquesFrozenEvent {
@@ -1063,6 +1284,21 @@ export class UniquesFrozenEvent {
    */
   get asV700(): {class: number, instance: number} {
     assert(this.isV700)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * Some `item` was frozen.
+   */
+  get isV9230(): boolean {
+    return this._chain.getEventHash('Uniques.Frozen') === 'ac39ace3905de6db862660444374575fb7ed5f403845b475c7f2addc21c71f91'
+  }
+
+  /**
+   * Some `item` was frozen.
+   */
+  get asV9230(): {collection: number, item: number} {
+    assert(this.isV9230)
     return this._chain.decodeEvent(this.event)
   }
 }
@@ -1109,6 +1345,21 @@ export class UniquesIssuedEvent {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
+
+  /**
+   * An `item` was issued.
+   */
+  get isV9230(): boolean {
+    return this._chain.getEventHash('Uniques.Issued') === '281c96f4233cbe042ed549cfca1fafa833d625f8d832ed29682ac34cdceb017d'
+  }
+
+  /**
+   * An `item` was issued.
+   */
+  get asV9230(): {collection: number, item: number, owner: Uint8Array} {
+    assert(this.isV9230)
+    return this._chain.decodeEvent(this.event)
+  }
 }
 
 export class UniquesMetadataClearedEvent {
@@ -1151,6 +1402,21 @@ export class UniquesMetadataClearedEvent {
    */
   get asV700(): {class: number, instance: number} {
     assert(this.isV700)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * Metadata has been cleared for an item.
+   */
+  get isV9230(): boolean {
+    return this._chain.getEventHash('Uniques.MetadataCleared') === 'ac39ace3905de6db862660444374575fb7ed5f403845b475c7f2addc21c71f91'
+  }
+
+  /**
+   * Metadata has been cleared for an item.
+   */
+  get asV9230(): {collection: number, item: number} {
+    assert(this.isV9230)
     return this._chain.decodeEvent(this.event)
   }
 }
@@ -1199,6 +1465,21 @@ export class UniquesMetadataSetEvent {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
+
+  /**
+   * New metadata has been set for an item.
+   */
+  get isV9230(): boolean {
+    return this._chain.getEventHash('Uniques.MetadataSet') === 'dc2370253c17fe69445af313af0113a31f244cc51324e5a3b4b0b98804f91a6f'
+  }
+
+  /**
+   * New metadata has been set for an item.
+   */
+  get asV9230(): {collection: number, item: number, data: Uint8Array, isFrozen: boolean} {
+    assert(this.isV9230)
+    return this._chain.decodeEvent(this.event)
+  }
 }
 
 export class UniquesOwnerChangedEvent {
@@ -1241,6 +1522,21 @@ export class UniquesOwnerChangedEvent {
    */
   get asV700(): {class: number, newOwner: Uint8Array} {
     assert(this.isV700)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * The owner changed.
+   */
+  get isV9230(): boolean {
+    return this._chain.getEventHash('Uniques.OwnerChanged') === '0331b0b161c2f2db690f574540ade7765af19f5306dc65443561fbaa5825f323'
+  }
+
+  /**
+   * The owner changed.
+   */
+  get asV9230(): {collection: number, newOwner: Uint8Array} {
+    assert(this.isV9230)
     return this._chain.decodeEvent(this.event)
   }
 }
@@ -1287,6 +1583,21 @@ export class UniquesTeamChangedEvent {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
+
+  /**
+   * The management team changed.
+   */
+  get isV9230(): boolean {
+    return this._chain.getEventHash('Uniques.TeamChanged') === '152cd89e42995f09fd841e2eeec18a6a0ca02740e481dc98e45b182742b5172e'
+  }
+
+  /**
+   * The management team changed.
+   */
+  get asV9230(): {collection: number, issuer: Uint8Array, admin: Uint8Array, freezer: Uint8Array} {
+    assert(this.isV9230)
+    return this._chain.decodeEvent(this.event)
+  }
 }
 
 export class UniquesThawedEvent {
@@ -1331,6 +1642,21 @@ export class UniquesThawedEvent {
     assert(this.isV700)
     return this._chain.decodeEvent(this.event)
   }
+
+  /**
+   * Some `item` was thawed.
+   */
+  get isV9230(): boolean {
+    return this._chain.getEventHash('Uniques.Thawed') === 'ac39ace3905de6db862660444374575fb7ed5f403845b475c7f2addc21c71f91'
+  }
+
+  /**
+   * Some `item` was thawed.
+   */
+  get asV9230(): {collection: number, item: number} {
+    assert(this.isV9230)
+    return this._chain.decodeEvent(this.event)
+  }
 }
 
 export class UniquesTransferredEvent {
@@ -1373,6 +1699,21 @@ export class UniquesTransferredEvent {
    */
   get asV700(): {class: number, instance: number, from: Uint8Array, to: Uint8Array} {
     assert(this.isV700)
+    return this._chain.decodeEvent(this.event)
+  }
+
+  /**
+   * An `item` was transferred.
+   */
+  get isV9230(): boolean {
+    return this._chain.getEventHash('Uniques.Transferred') === 'ac8c1c5a1df2a464e3447d13d6c43a813112a33c144f93775b934b08c086bf7a'
+  }
+
+  /**
+   * An `item` was transferred.
+   */
+  get asV9230(): {collection: number, item: number, from: Uint8Array, to: Uint8Array} {
+    assert(this.isV9230)
     return this._chain.decodeEvent(this.event)
   }
 }

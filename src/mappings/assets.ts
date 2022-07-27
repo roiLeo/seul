@@ -7,7 +7,7 @@ import {
   TransferType,
 } from "../model/generated";
 import { getAssetBalanceId } from "./helpers/common";
-import { get, getOrCreate } from "./helpers/entity-utils";
+import { encodeId, get, getOrCreate, isAdressSS58 } from "./helpers/entity-utils";
 import { EventHandlerContext } from "@subsquid/substrate-processor";
 import { Store } from "@subsquid/typeorm-store/lib/store";
 import { AssetsCreateCall } from "../types/calls";
@@ -92,18 +92,21 @@ export async function changeAssetBalance(ctx: EventHandlerContext<Store, {event:
 export async function assetCreated(ctx: EventHandlerContext<Store, {event: true}>) {
   let event = new events.AssetsCreatedEvent(ctx);
   if (event.isV1) {
-    var [assetId, creator, owner] = event.asV1;
+    var [assetId, creatorA, ownerA] = event.asV1;
   }
   else if (event.isV700) {
-    var {assetId, creator, owner} = event.asV700;
+    var {assetId, creator: creatorA, owner: ownerA} = event.asV700;
   }
   else {
     throw event.constructor.name;
   }
+  let creator = isAdressSS58(creatorA) ? encodeId(creatorA) : null;
+  let owner = isAdressSS58(ownerA) ? encodeId(ownerA) : null;
+  if (!owner) return;
   const asset = new Asset();
   asset.id = assetId.toString();
-  asset.creator = creator.toString();
-  asset.owner = owner.toString();
+  asset.creator = creator;
+  asset.owner = owner;
   asset.freezer = asset.admin = asset.owner;
   asset.status = AssetStatus.ACTIVE;
   assert(ctx.event.call);
@@ -118,35 +121,40 @@ export async function assetCreated(ctx: EventHandlerContext<Store, {event: true}
 export async function assetOwnerChanged(ctx: EventHandlerContext<Store, {event: {args: true}}>) {
   let event = new events.AssetsOwnerChangedEvent(ctx);
   if (event.isV1) {
-    var [assetId, owner] = event.asV1;
+    var [assetId, ownerA] = event.asV1;
   }
   else if (event.isV700) {
-    var { assetId, owner } = event.asV700;
+    var { assetId, owner: ownerA } = event.asV700;
   }
   else {
     throw event.constructor.name;
   }
+  let owner = isAdressSS58(ownerA) ? encodeId(ownerA) : null;
+  if (!owner) return;
   const asset = await getAssetById(assetId.toString(), ctx.store);
-  asset.owner = owner.toString();
+  asset.owner = owner;
   await ctx.store.save(asset);
 }
 
 export async function assetTeamChanged(ctx: EventHandlerContext<Store, {event: {args: true}}>) {
   let event = new events.AssetsTeamChangedEvent(ctx);
   if (event.isV1) {
-    var [assetId, issuer, admin, freezer] = event.asV1;
+    var [assetId, issuerA, adminA, freezerA] = event.asV1;
   }
   else if (event.isV700) {
-    var {assetId, issuer, admin, freezer} = event.asV700;
+    var {assetId, issuer: issuerA, admin: adminA, freezer: freezerA} = event.asV700;
   }
   else {
     throw event.constructor.name;
   }
+  let issuer = isAdressSS58(issuerA) ? encodeId(issuerA) : null;
+  let admin = isAdressSS58(adminA) ? encodeId(adminA) : null;
+  let freezer = isAdressSS58(freezerA) ? encodeId(freezerA) : null;
   const asset = await getAssetById(assetId.toString(), ctx.store);
 
-  asset.issuer = issuer.toString();
-  asset.admin = admin.toString();
-  asset.freezer = freezer.toString();
+  asset.issuer = issuer;
+  asset.admin = admin;
+  asset.freezer = freezer;
 
   await ctx.store.save(asset);
 }
@@ -245,18 +253,20 @@ export async function assetMetadataCleared(ctx: EventHandlerContext<Store, {even
 export async function assetIssued(ctx: EventHandlerContext<Store>) {
   let event = new events.AssetsIssuedEvent(ctx);
   if (event.isV1) {
-    var [assetId, owner, totalSupply] = event.asV1;
+    var [assetId, ownerA, totalSupply] = event.asV1;
   }
   else if (event.isV700) {
-    var {assetId, owner, totalSupply} = event.asV700;
+    var {assetId, owner: ownerA, totalSupply} = event.asV700;
   }
   else {
     throw event.constructor.name;
   }
+  let owner = isAdressSS58(ownerA) ? encodeId(ownerA) : null;
+  if (!owner) return;
   const [asset] = await changeAssetBalance(
     ctx,
     assetId.toString(),
-    owner.toString(),
+    owner,
     totalSupply
   );
   asset.totalSupply = asset.totalSupply || 0n + totalSupply
@@ -270,7 +280,7 @@ export async function assetIssued(ctx: EventHandlerContext<Store>) {
   transfer.blockNum = ctx.block.height;
   transfer.createdAt = new Date(ctx.block.timestamp);
   transfer.extrinisicId = ctx.event.extrinsic?.hash;
-  transfer.to = owner.toString();
+  transfer.to = owner;
   transfer.id = ctx.event.id;
   transfer.type = TransferType.MINT;
   transfer.success = true;
@@ -280,22 +290,25 @@ export async function assetIssued(ctx: EventHandlerContext<Store>) {
 export async function assetTransfer(ctx: EventHandlerContext<Store>) {
   let event = new events.AssetsTransferredEvent(ctx);
   if (event.isV1) {
-    var [assetId, from, to, amount] = event.asV1;
+    var [assetId, fromA, toA, amount] = event.asV1;
   }
   else if (event.isV700) {
-    var {assetId, from, to, amount} = event.asV700;
+    var {assetId, from: fromA, to: toA, amount} = event.asV700;
   }
   else {
     throw event.constructor.name;
   }
+  let to = isAdressSS58(toA) ? encodeId(toA) : null;
+  let from = isAdressSS58(fromA) ? encodeId(fromA) : null;
+  if (!from || !to) return;
   const [asset] = await changeAssetBalance(
     ctx,
     assetId.toString(),
-    from.toString(),
+    from,
     BigInt(-amount) // decrements from sender account
   );
 
-  await changeAssetBalance(ctx, asset, to.toString(), amount);
+  await changeAssetBalance(ctx, asset, to, amount);
 
   const transfer = new Transfer();
   transfer.amount = amount;
@@ -304,8 +317,8 @@ export async function assetTransfer(ctx: EventHandlerContext<Store>) {
   transfer.blockNum = ctx.block.height;
   transfer.createdAt = new Date(ctx.block.timestamp);
   transfer.extrinisicId = ctx.event.extrinsic?.hash;
-  transfer.to = to.toString();
-  transfer.from = from.toString();
+  transfer.to = to;
+  transfer.from = from;
   transfer.id = ctx.event.id;
   transfer.type = TransferType.REGULAR;
   transfer.success = true;
@@ -315,18 +328,20 @@ export async function assetTransfer(ctx: EventHandlerContext<Store>) {
 export async function assetBalanceBurned(ctx: EventHandlerContext<Store>) {
   let event = new events.AssetsBurnedEvent(ctx);
   if (event.isV1) {
-    var [assetId, owner, balance] = event.asV1;
+    var [assetId, ownerA, balance] = event.asV1;
   }
   else if (event.isV700) {
-    var {assetId, owner, balance} = event.asV700;
+    var {assetId, owner: ownerA, balance} = event.asV700;
   }
   else {
     throw event.constructor.name;
   }
+  let owner = isAdressSS58(ownerA) ? encodeId(ownerA) : null;
+  if (!owner) return;
   const [asset] = await changeAssetBalance(
     ctx,
     assetId.toString(),
-    owner.toString(),
+    owner,
     BigInt(-balance) // decrements from account
   );
 
@@ -337,7 +352,7 @@ export async function assetBalanceBurned(ctx: EventHandlerContext<Store>) {
   transfer.blockNum = ctx.block.height;
   transfer.createdAt = new Date(ctx.block.timestamp);
   transfer.extrinisicId = ctx.event.extrinsic?.hash;
-  transfer.from = owner.toString();
+  transfer.from = owner;
   transfer.id = ctx.event.id;
   transfer.type = TransferType.BURN;
   transfer.success = true;
@@ -347,22 +362,25 @@ export async function assetBalanceBurned(ctx: EventHandlerContext<Store>) {
 export async function assetTransferredApproved(ctx: EventHandlerContext<Store>) {
   let event = new events.AssetsTransferredApprovedEvent(ctx);
   if (event.isV1) {
-    var [assetId, owner, delegate, destination, amount] = event.asV1;
+    var [assetId, ownerA, delegate, destinationA, amount] = event.asV1;
   }
   else if (event.isV700) {
-    var {assetId, owner, delegate, destination, amount} = event.asV700;
+    var {assetId, owner: ownerA, delegate, destination: destinationA, amount} = event.asV700;
   }
   else {
     throw event.constructor.name;
   }
+  let owner = isAdressSS58(ownerA) ? encodeId(ownerA) : null;
+  let destination = isAdressSS58(destinationA) ? encodeId(destinationA) : null;
+  if (!owner || !destination) return;
   const [asset] = await changeAssetBalance(
     ctx,
     assetId.toString(),
-    owner.toString(),
+    owner,
     BigInt(-amount) // decrements from sender account
   );
 
-  await changeAssetBalance(ctx, asset, destination.toString(), amount);
+  await changeAssetBalance(ctx, asset, destination, amount);
 
   const transfer = new Transfer();
   transfer.amount = amount;
@@ -371,8 +389,8 @@ export async function assetTransferredApproved(ctx: EventHandlerContext<Store>) 
   transfer.blockNum = ctx.block.height;
   transfer.createdAt = new Date(ctx.block.timestamp);
   transfer.extrinisicId = ctx.event.extrinsic?.hash; 
-  transfer.to = destination.toString();
-  transfer.from = owner.toString();
+  transfer.to = destination;
+  transfer.from = owner;
   transfer.delegator = delegate.toString();
   transfer.id = ctx.event.id;
   transfer.type = TransferType.DELEGATED;
@@ -383,18 +401,20 @@ export async function assetTransferredApproved(ctx: EventHandlerContext<Store>) 
 export async function assetAccountFrozen(ctx: EventHandlerContext<Store>) {
   let event = new events.AssetsFrozenEvent(ctx);
   if (event.isV1) {
-    var [assetId, who] = event.asV1;
+    var [assetId, whoA] = event.asV1;
   }
   else if (event.isV700) {
-    var {assetId, who} = event.asV700;
+    var {assetId, who: whoA} = event.asV700;
   }
   else {
     throw event.constructor.name;
   }
+  let who = isAdressSS58(whoA) ? encodeId(whoA) : null;
+  if (!who) return;
   const [asset, , assetBalance] = await getAssetAccountDetails(
     ctx.store,
     assetId.toString(),
-    who.toString()
+    who
   );
   assetBalance.status = AssetStatus.FREEZED;
   await ctx.store.save(assetBalance);
@@ -406,7 +426,7 @@ export async function assetAccountFrozen(ctx: EventHandlerContext<Store>) {
   transfer.blockNum = ctx.block.height;
   transfer.createdAt = new Date(ctx.block.timestamp);
   transfer.extrinisicId = ctx.event.extrinsic?.hash;
-  transfer.from = who.toString();
+  transfer.from = who;
   transfer.id = ctx.event.id;
   transfer.type = TransferType.FREEZE;
   transfer.success = true;
@@ -416,18 +436,20 @@ export async function assetAccountFrozen(ctx: EventHandlerContext<Store>) {
 export async function assetBalanceThawed(ctx: EventHandlerContext<Store>) {
   let event = new events.AssetsThawedEvent(ctx);
   if (event.isV1) {
-    var [assetId, who] = event.asV1;
+    var [assetId, whoA] = event.asV1;
   }
   else if (event.isV700) {
-    var {assetId, who} = event.asV700;
+    var {assetId, who: whoA} = event.asV700;
   }
   else {
     throw event.constructor.name;
   }
+  let who = isAdressSS58(whoA) ? encodeId(whoA) : null;
+  if (!who) return;
   const [asset, , assetBalance] = await getAssetAccountDetails(
     ctx.store,
     assetId.toString(),
-    who.toString()
+    who
   );
   assetBalance.status = AssetStatus.ACTIVE;
   await ctx.store.save(assetBalance);
@@ -439,7 +461,7 @@ export async function assetBalanceThawed(ctx: EventHandlerContext<Store>) {
   transfer.blockNum = ctx.block.height;
   transfer.createdAt = new Date(ctx.block.timestamp);
   transfer.extrinisicId = ctx.event.extrinsic?.hash;
-  transfer.from = who.toString();
+  transfer.from = who;
   transfer.id = ctx.event.id;
   transfer.type = TransferType.THAWED;
   transfer.success = true;

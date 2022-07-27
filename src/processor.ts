@@ -1,22 +1,17 @@
-import { lookupArchive } from "@subsquid/archive-registry";
 import { SubstrateProcessor } from "@subsquid/substrate-processor";
 import { TypeormDatabase } from "@subsquid/typeorm-store";
-// import { assetAccountFrozen, assetBalanceBurned, assetBalanceThawed, assetCreated, assetDestroyed, assetFrozen, assetMetadataSet, assetMetadataCleared, assetOwnerChanged, assetTeamChanged, assetThawed, assetTransfer, balancesTransfer, transferFee, uniqueClassCreated, uniqueClassDestroyed, uniqueClassFrozen, uniqueClassThawed, uniqueInstanceBurned, uniqueInstanceFrozen, uniqueInstanceIssued, uniqueInstanceThawed, uniqueInstanceTransferred, uniquesMetadataSet, uniquesMetadataCleared } from "./mappings";
+// import config from "./config";
 import * as mappings from "./mappings"
-
-// const processor = new substrateProcessor.SubstrateProcessor('statemine_balances');
 
 const database = new TypeormDatabase();
 const processor = new SubstrateProcessor(database)
-/* processor.setDataSource({
-	archive: 'https://kusama.archive.subsquid.io/graphql',
-	chain: 'wss://statemine-rpc.polkadot.io'
-}) */
-processor.setBatchSize(500);
+// processor.setTypesBundle(config.typesBundle)
+// processor.setBatchSize(config.batchSize || 500)
+// processor.setDataSource(config.dataSource)
 
+processor.setBatchSize(500);
 processor.setDataSource({
     archive: 'https://statemine.archive.subsquid.io/graphql', 
-	// archive: lookupArchive("statemine", { release: "FireSquid" }),
     chain: 'wss://statemine-rpc.polkadot.io'
 })
 
@@ -46,13 +41,15 @@ processor.addEventHandler('Uniques.Frozen', mappings.uniqueInstanceFrozen);
 processor.addEventHandler('Uniques.Thawed', mappings.uniqueInstanceThawed);
 processor.addEventHandler('Uniques.ClassFrozen', mappings.uniqueClassFrozen);
 processor.addEventHandler('Uniques.ClassThawed', mappings.uniqueClassThawed);
-// processor.addEventHandler('Uniques.CollectionMetadataSet', mappings.uniquesCollectionMetadataSet);
-// processor.addEventHandler('Uniques.CollectionMetadataCleared', mappings.uniquesCollectionMetadataCleared);
+processor.addEventHandler('Uniques.CollectionMetadataSet', mappings.uniquesCollectionMetadataSet);
+processor.addEventHandler('Uniques.CollectionMetadataCleared', mappings.uniquesCollectionMetadataCleared);
+processor.addEventHandler('Uniques.ClassMetadataSet', mappings.uniquesClassMetadataSet);
+processor.addEventHandler('Uniques.ClassMetadataCleared', mappings.uniquesClassMetadataCleared);
 processor.addEventHandler('Uniques.MetadataSet', mappings.uniquesMetadataSet);
 processor.addEventHandler('Uniques.MetadataCleared', mappings.uniquesMetadataCleared);
 processor.addEventHandler('Uniques.TeamChanged', mappings.uniquesTeamChanged);
 processor.addEventHandler('Uniques.OwnerChanged', mappings.uniquesOwnerChanged);
-// processor.addEventHandler('Uniques.AttributeSet', mappings.uniquesAttributeSet);
+processor.addEventHandler('Uniques.AttributeSet', mappings.uniquesAttributeSet);
 processor.addEventHandler('Uniques.AttributeCleared', mappings.uniquesAttributeCleared);
 
 
@@ -63,13 +60,5 @@ interface TransferEvent {
 	to: Uint8Array;
 	amount: bigint;
 }
-
-/* npx squid-substrate-metadata-explorer \
---chain wss://statemine-rpc.polkadot.io \
---archive https://statemine.archive.subsquid.io/graphql \
---out statemineVersions.jsonl */
-
-
-
 
 

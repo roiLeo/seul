@@ -1,6 +1,6 @@
 {
 	"outDir": "src/types",
-	"specVersions": "statemineVersions.jsonl", 
+	"specVersions": "https://statemine.archive.subsquid.io/graphql", 
 	"typesBundle": "statemine", 
 	"events": [ 
 		"Balances.Transfer",
@@ -32,6 +32,10 @@
 		"Uniques.ClassThawed",
 		"Uniques.MetadataSet",
 		"Uniques.MetadataCleared",
+		"Uniques.ClassMetadataSet",
+		"Uniques.ClassMetadataCleared",
+		"Uniques.CollectionMetadataSet",
+		"Uniques.CollectionMetadataCleared",
 		"Uniques.AttributeSet",
 		"Uniques.AttributeCleared"
 	],

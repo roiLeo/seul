@@ -38,6 +38,6 @@ export class UniqueInstance {
   @Column_("text", {nullable: true})
   metadata!: string | undefined | null
 
-  @Column_("jsonb", {transformer: {to: obj => obj == null ? undefined : obj.map((val: any) => val.toJSON()), from: obj => obj == null ? undefined : marshal.fromList(obj, val => new Attribute(undefined, marshal.nonNull(val)))}, nullable: true})
-  attributes!: (Attribute)[] | undefined | null
+  @Column_("jsonb", {transformer: {to: obj => obj.map((val: any) => val.toJSON()), from: obj => marshal.fromList(obj, val => new Attribute(undefined, marshal.nonNull(val)))}, nullable: false})
+  attributes!: (Attribute)[]
 }

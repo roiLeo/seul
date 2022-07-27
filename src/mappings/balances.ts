@@ -3,54 +3,59 @@ import { Store } from "@subsquid/typeorm-store";
 import { Account, HistoricalBalance, Transfer, TransferType } from "../model";
 
 import { BalancesDepositEvent, BalancesTransferEvent } from "../types/events";
-import { get, getOrCreate } from "./helpers/entity-utils";
+import { encodeId, get, getOrCreate, isAdressSS58 } from "./helpers/entity-utils";
 
 export async function balancesTransfer(ctx: EventHandlerContext<Store>) {
   let event = new BalancesTransferEvent(ctx);
   if (event.isV1) {
-    var [from, to, value] = event.asV1;
+    var [fromA, toA, value] = event.asV1;
   }
   else if (event.isV700) {
-    var {from, to, amount: value} = event.asV700;
+    var {from: fromA, to: toA, amount: value} = event.asV700;
   }
   else {
     throw event.constructor.name;
   }
 
   const tip = ctx.event.extrinsic?.tip || 0n;
-
-  const fromAcc = await getOrCreate(ctx.store, Account, from.toString());
-  fromAcc.wallet = from.toString();
+  let to = isAdressSS58(toA) ? encodeId(toA) : null;
+  let from = isAdressSS58(fromA) ? encodeId(fromA) : null;
+  if (!to || !from) return;
+  const fromAcc = await getOrCreate(ctx.store, Account, from);
+  fromAcc.wallet = from;
   fromAcc.balance = fromAcc.balance || 0n;
   fromAcc.balance -= value;
   fromAcc.balance -= tip;
   await ctx.store.save(fromAcc);
 
-  const toAcc = await getOrCreate(ctx.store, Account, to.toString());
-  toAcc.wallet = to.toString();
+  const toAcc = await getOrCreate(ctx.store, Account, to);
+  toAcc.wallet = to;
   toAcc.balance = toAcc.balance || 0n;
   toAcc.balance += value;
   await ctx.store.save(toAcc);
 
   const hbFrom = new HistoricalBalance();
+  hbFrom.id = ctx.event.id + 'from';
   hbFrom.account = fromAcc;
   hbFrom.balance = fromAcc.balance;
   hbFrom.timestamp = new Date(ctx.block.timestamp);
   await ctx.store.save(hbFrom);
 
   const hbTo = new HistoricalBalance();
+  hbTo.id = ctx.event.id + 'to';
   hbTo.account = toAcc;
   hbTo.balance = toAcc.balance;
   hbTo.timestamp = new Date(ctx.block.timestamp);
   await ctx.store.save(hbTo);
 
   const transfer = new Transfer();
+  transfer.id = ctx.event.id + 'transfer';
   transfer.amount = value;
   transfer.blockHash = ctx.block.hash;
   transfer.blockNum = ctx.block.height;
   transfer.extrinisicId = ctx.event.extrinsic?.id;
-  transfer.from = from.toString();
-  transfer.to = to.toString();
+  transfer.from = from;
+  transfer.to = to;
   transfer.success = true;
   transfer.id = ctx.event.id;
   transfer.type = TransferType.REGULAR;
