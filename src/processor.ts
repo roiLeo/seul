@@ -15,7 +15,7 @@ processor.setDataSource({
     chain: 'wss://statemine-rpc.polkadot.io'
 })
 
-// processor.setBlockRange({from: 66725});  TODO: FATAL ERROR
+processor.setBlockRange({from: 338770});
 
 processor.addEventHandler('Balances.Transfer', mappings.balancesTransfer);
 processor.addEventHandler('Balances.Deposit', mappings.transferFee);
@@ -43,8 +43,8 @@ processor.addEventHandler('Uniques.ClassFrozen', mappings.uniqueClassFrozen);
 processor.addEventHandler('Uniques.ClassThawed', mappings.uniqueClassThawed);
 processor.addEventHandler('Uniques.CollectionMetadataSet', mappings.uniquesCollectionMetadataSet);
 processor.addEventHandler('Uniques.CollectionMetadataCleared', mappings.uniquesCollectionMetadataCleared);
-processor.addEventHandler('Uniques.ClassMetadataSet', mappings.uniquesClassMetadataSet);
-processor.addEventHandler('Uniques.ClassMetadataCleared', mappings.uniquesClassMetadataCleared);
+// processor.addEventHandler('Uniques.ClassMetadataSet', mappings.uniquesClassMetadataSet);
+// processor.addEventHandler('Uniques.ClassMetadataCleared', mappings.uniquesClassMetadataCleared);
 processor.addEventHandler('Uniques.MetadataSet', mappings.uniquesMetadataSet);
 processor.addEventHandler('Uniques.MetadataCleared', mappings.uniquesMetadataCleared);
 processor.addEventHandler('Uniques.TeamChanged', mappings.uniquesTeamChanged);

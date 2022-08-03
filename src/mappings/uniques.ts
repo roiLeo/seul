@@ -82,7 +82,6 @@ export async function uniqueClassCreated(ctx: EventHandlerContext<Store>) {
   uniqueClass.owner = owner.toString();
   uniqueClass.status = AssetStatus.ACTIVE;
   uniqueClass.attributes = [];
-  uniqueClass.metadata = null;
 
   await ctx.store.save(uniqueClass);
 
