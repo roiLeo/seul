@@ -1,5 +1,6 @@
 import { EventHandlerContext } from "@subsquid/substrate-processor";
 import { Store } from "@subsquid/typeorm-store";
+import assert from "assert";
 import {
   Account,
   UniqueClass,
@@ -64,22 +65,25 @@ export function getInstanceGlobalId(
 export async function uniqueClassCreated(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesCreatedEvent(ctx);
   if (event.isV1) {
-    var [classId, creator, owner] = event.asV1;
+    var [classId, creatorA, ownerA] = event.asV1;
   }
   else if (event.isV700) {
-    var {class: classId, creator, owner} = event.asV700;
+    var {class: classId, creator: creatorA, owner: ownerA} = event.asV700;
   }
   else if (event.isV9230) {
-    var {collection: classId, creator, owner} = event.asV9230;
+    var {collection: classId, creator: creatorA, owner: ownerA} = event.asV9230;
   }
   else {
     throw event.constructor.name;
   }
   const uniqueClass = new UniqueClass();
-
+  let creator = isAdressSS58(creatorA) ? encodeId(creatorA) : null;
+  let owner = isAdressSS58(ownerA) ? encodeId(ownerA) : null;
+  // assert(creator);
+  // assert(owner);
   uniqueClass.id = classId.toString();
-  uniqueClass.creator = creator.toString();
-  uniqueClass.owner = owner.toString();
+  uniqueClass.creator = creator;
+  uniqueClass.owner = owner;
   uniqueClass.status = AssetStatus.ACTIVE;
   uniqueClass.attributes = [];
 
@@ -91,7 +95,7 @@ export async function uniqueClassCreated(ctx: EventHandlerContext<Store>) {
   transfer.blockNum = ctx.block.height;
   transfer.createdAt = new Date(ctx.block.timestamp);
   transfer.extrinisicId = ctx.event.extrinsic?.id;
-  transfer.to = owner.toString();
+  transfer.to = owner;
   transfer.id = ctx.event.id;
   transfer.type = TransferType.CREATED;
   transfer.success = true;
@@ -193,33 +197,35 @@ export async function uniqueClassDestroyed(ctx: EventHandlerContext<Store>) {
 export async function uniqueInstanceIssued(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesIssuedEvent(ctx);
   if (event.isV1) {
-    var [classId, instance, owner] = event.asV1;
+    var [classId, instance, ownerA] = event.asV1;
   }
   else if (event.isV700) {
-    var {class: classId, instance, owner} = event.asV700;
+    var {class: classId, instance, owner: ownerA} = event.asV700;
   }
   else if (event.isV9230) {
-    var {collection: classId, item: instance, owner} = event.asV9230;
+    var {collection: classId, item: instance, owner: ownerA} = event.asV9230;
   }
   else {
     throw event.constructor.name;
   }
+  let owner = isAdressSS58(ownerA) ? encodeId(ownerA) : null;
+  assert(owner);
   const uniqueClassPromise = getOrCreate(
     ctx.store,
     UniqueClass,
     classId.toString()
   );
 
-  const ownerAccountPromise = getAccountByWallet(ctx.store, owner.toString());
+  const ownerAccountPromise = getAccountByWallet(ctx.store, owner);
 
   const [class_, ownerAccount] = await Promise.all([
     uniqueClassPromise,
     ownerAccountPromise,
   ]);
 
+  assert(class_);
   class_.status = class_.status ?? AssetStatus.ACTIVE;
   await ctx.store.save(class_);
-
   const uniqueInstance = new UniqueInstance();
   const innerInstanceid = instance.toString();
   uniqueInstance.id = getInstanceGlobalId(class_.id, innerInstanceid);
@@ -238,7 +244,7 @@ export async function uniqueInstanceIssued(ctx: EventHandlerContext<Store>) {
   transfer.blockNum = ctx.block.height;
   transfer.createdAt = new Date(ctx.block.timestamp);
   transfer.extrinisicId = ctx.event.extrinsic?.id;
-  transfer.to = owner.toString();
+  transfer.to = owner;
   transfer.id = ctx.event.id;
   transfer.type = TransferType.MINT;
   transfer.success = true;
@@ -485,7 +491,13 @@ export async function uniquesMetadataSet(ctx: EventHandlerContext<Store>) {
   else {
     throw event.constructor.name;
   }
-  const inst = await getOrDie(ctx.store, UniqueInstance, instance.toString());
+  let instanceId = classId.toString() + '-' + instance.toString();
+  try {
+    var inst = await getOrDie(ctx.store, UniqueInstance, instanceId);
+  }
+  catch (e) {
+    return;
+  }
   inst.metadata = hexToString(data.toString());
   await ctx.store.save(inst);
 }
@@ -504,9 +516,15 @@ export async function uniquesMetadataCleared(ctx: EventHandlerContext<Store>) {
   else {
     throw event.constructor.name;
   }
-  const inst = await getOrDie(ctx.store, UniqueInstance, instance.toString());
+  let instanceId = classId.toString() + '-' + instance.toString();
+  try {
+    var inst = await getOrDie(ctx.store, UniqueInstance, instanceId);
+  }
+  catch (e) {
+    return
+  }
   inst.metadata = null;
-  await ctx.store.save(inst);   //Can just save instance? or need to add to class
+  await ctx.store.save(inst);
 }
 
 export async function uniquesAttributeSet(ctx: EventHandlerContext<Store>) {
@@ -523,12 +541,18 @@ export async function uniquesAttributeSet(ctx: EventHandlerContext<Store>) {
   else {
     throw event.constructor.name;
   }
-  let classOrInstance = instance ? await getOrDie(ctx.store, UniqueInstance, instance.toString()) :
-                                   await getOrDie(ctx.store, UniqueClass, classId.toString());
 
-  let attrIndex = classOrInstance.attributes.findIndex(attr => attr.key == key.toString());
-  if (attrIndex !== -1) classOrInstance.attributes[attrIndex].value = value.toString();
-  else classOrInstance.attributes.push( new Attribute({key: key.toString(), value: value.toString()}) );
+  try {
+    var classOrInstance = instance ? await getOrDie(ctx.store, UniqueInstance, classId.toString() + '-' + instance.toString()) :
+                                   await getOrDie(ctx.store, UniqueClass, classId.toString());
+  }
+  catch (e) {
+    return
+  }
+
+  let attrIndex = classOrInstance.attributes?.findIndex(attr => attr.key == key.toString());
+  if (attrIndex && classOrInstance.attributes && classOrInstance.attributes.length && attrIndex !== -1) classOrInstance.attributes[attrIndex].value = value.toString();
+  else classOrInstance.attributes?.push( new Attribute({key: key.toString(), value: value.toString()}) );
   await ctx.store.save(classOrInstance);
 }
 
@@ -546,9 +570,14 @@ export async function uniquesAttributeCleared(ctx: EventHandlerContext<Store>) {
   else {
     throw event.constructor.name;
   }
-  let classOrInstance = instance ? await getOrDie(ctx.store, UniqueInstance, instance.toString()) :
-                                   await getOrDie(ctx.store, UniqueClass, classId.toString());
-  classOrInstance.attributes.filter(attr => attr.key != key.toString());
+  try {
+    var classOrInstance = instance ? await getOrDie(ctx.store, UniqueInstance, classId.toString() + '-' + instance.toString()) :
+                                    await getOrDie(ctx.store, UniqueClass, classId.toString());
+  }
+  catch (e) {
+    return
+  }
+  classOrInstance.attributes?.filter(attr => attr.key != key.toString());
   await ctx.store.save(classOrInstance);
 }
 

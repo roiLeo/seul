@@ -19,11 +19,11 @@ export class UniqueInstance {
   innerID!: string
 
   @Index_()
-  @ManyToOne_(() => UniqueClass, {nullable: false})
+  @ManyToOne_(() => UniqueClass, {nullable: true})
   uniqueClass!: UniqueClass
 
   @Index_()
-  @ManyToOne_(() => Account, {nullable: false})
+  @ManyToOne_(() => Account, {nullable: true})
   owner!: Account
 
   @Column_("varchar", {length: 9, nullable: false})

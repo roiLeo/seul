@@ -8,11 +8,11 @@ import {
 } from "../model/generated";
 import { getAssetBalanceId } from "./helpers/common";
 import { encodeId, get, getOrCreate, isAdressSS58 } from "./helpers/entity-utils";
-import { EventHandlerContext } from "@subsquid/substrate-processor";
-import { Store } from "@subsquid/typeorm-store/lib/store";
 import { AssetsCreateCall } from "../types/calls";
 import * as events from "../types/events";
 import  assert  from "assert"
+import { Store } from "@subsquid/typeorm-store";
+import { EventHandlerContext } from "@subsquid/substrate-processor";
 
 /**
  * Get asset from database
@@ -110,9 +110,17 @@ export async function assetCreated(ctx: EventHandlerContext<Store, {event: true}
   asset.freezer = asset.admin = asset.owner;
   asset.status = AssetStatus.ACTIVE;
   assert(ctx.event.call);
-  const call = new AssetsCreateCall(ctx, ctx.event.call);
-  const {id, admin, minBalance} = call.asV504;
-  asset.minBalance = minBalance;  // параметр колла event.call.args;
+  try {
+    const call = new AssetsCreateCall(ctx, ctx.event.call);
+    const {id, admin, minBalance} = call.asV504;
+    asset.minBalance = minBalance;  // параметр колла event.call.args;
+  }
+  catch (err) {
+    const call = ctx.event.call.args?.calls?.find((c: {__kind: string, value: any}) => 
+      c.__kind === 'Assets' && c.value && c.value.__kind === 'create'
+    );
+    call && (asset.minBalance = call.value.minBalance ? BigInt(call.value.minBalance) : null);
+  }
   asset.totalSupply = 0n;
 
   await ctx.store.save(asset);

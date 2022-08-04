@@ -1,13 +1,9 @@
 import { SubstrateProcessor } from "@subsquid/substrate-processor";
 import { TypeormDatabase } from "@subsquid/typeorm-store";
-// import config from "./config";
 import * as mappings from "./mappings"
 
 const database = new TypeormDatabase();
 const processor = new SubstrateProcessor(database)
-// processor.setTypesBundle(config.typesBundle)
-// processor.setBatchSize(config.batchSize || 500)
-// processor.setDataSource(config.dataSource)
 
 processor.setBatchSize(500);
 processor.setDataSource({
@@ -17,8 +13,6 @@ processor.setDataSource({
 
 processor.setBlockRange({from: 338770});
 
-processor.addEventHandler('Balances.Transfer', mappings.balancesTransfer);
-processor.addEventHandler('Balances.Deposit', mappings.transferFee);
 processor.addEventHandler('Assets.Created', mappings.assetCreated);
 processor.addEventHandler('Assets.AssetFrozen', mappings.assetFrozen);
 processor.addEventHandler('Assets.AssetThawed', mappings.assetThawed);
@@ -43,8 +37,8 @@ processor.addEventHandler('Uniques.ClassFrozen', mappings.uniqueClassFrozen);
 processor.addEventHandler('Uniques.ClassThawed', mappings.uniqueClassThawed);
 processor.addEventHandler('Uniques.CollectionMetadataSet', mappings.uniquesCollectionMetadataSet);
 processor.addEventHandler('Uniques.CollectionMetadataCleared', mappings.uniquesCollectionMetadataCleared);
-// processor.addEventHandler('Uniques.ClassMetadataSet', mappings.uniquesClassMetadataSet);
-// processor.addEventHandler('Uniques.ClassMetadataCleared', mappings.uniquesClassMetadataCleared);
+processor.addEventHandler('Uniques.ClassMetadataSet', mappings.uniquesClassMetadataSet);
+processor.addEventHandler('Uniques.ClassMetadataCleared', mappings.uniquesClassMetadataCleared);
 processor.addEventHandler('Uniques.MetadataSet', mappings.uniquesMetadataSet);
 processor.addEventHandler('Uniques.MetadataCleared', mappings.uniquesMetadataCleared);
 processor.addEventHandler('Uniques.TeamChanged', mappings.uniquesTeamChanged);

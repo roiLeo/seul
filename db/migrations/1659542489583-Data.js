@@ -1,21 +1,21 @@
-module.exports = class Data1659539690662 {
-  name = 'Data1659539690662'
+module.exports = class Data1659542489583 {
+  name = 'Data1659542489583'
 
   async up(db) {
     await db.query(`CREATE TABLE "transfer" ("id" character varying NOT NULL, "amount" numeric, "to" text, "from" text, "delegator" text, "fee" numeric, "type" character varying(9) NOT NULL, "extrinisic_id" text, "success" boolean NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "block_hash" text NOT NULL, "block_num" integer NOT NULL, "asset_id" character varying, CONSTRAINT "PK_fd9ddbdd49a17afcbe014401295" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_e818cd083f48ed773afe017f7c" ON "transfer" ("asset_id") `)
-    await db.query(`CREATE TABLE "unique_class" ("id" character varying NOT NULL, "owner" text, "admin" text, "issuer" text, "creator" text, "freezer" text, "total_deposit" numeric, "name" text, "status" character varying(9) NOT NULL, "metadata" text, "attributes" jsonb NOT NULL, CONSTRAINT "PK_3709d5e3a17fbd4901c0aaa1487" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "unique_class" ("id" character varying NOT NULL, "owner" text, "admin" text, "issuer" text, "creator" text, "freezer" text, "total_deposit" numeric, "name" text, "status" character varying(9) NOT NULL, "metadata" text, "attributes" jsonb, CONSTRAINT "PK_3709d5e3a17fbd4901c0aaa1487" PRIMARY KEY ("id"))`)
     await db.query(`CREATE TABLE "unique_transfer" ("id" character varying NOT NULL, "to" text, "from" text, "delegator" text, "fee" numeric, "type" character varying(9) NOT NULL, "extrinisic_id" text, "success" boolean NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "block_hash" text NOT NULL, "block_num" integer NOT NULL, "unique_class_id" character varying, "unique_instance_id" character varying, CONSTRAINT "PK_7d6ae97266747834d3e832cb8fc" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_008d9f4e0b30b62b439b092d21" ON "unique_transfer" ("unique_class_id") `)
     await db.query(`CREATE INDEX "IDX_09165fa651ab2faa61f64c8891" ON "unique_transfer" ("unique_instance_id") `)
-    await db.query(`CREATE TABLE "unique_instance" ("id" character varying NOT NULL, "inner_id" text NOT NULL, "status" character varying(9) NOT NULL, "deposit" numeric, "metadata" text, "attributes" jsonb NOT NULL, "unique_class_id" character varying NOT NULL, "owner_id" character varying NOT NULL, CONSTRAINT "PK_f7c8a41b5a9d0e3eeb5ab3871b0" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "unique_instance" ("id" character varying NOT NULL, "inner_id" text NOT NULL, "status" character varying(9) NOT NULL, "deposit" numeric, "metadata" text, "attributes" jsonb NOT NULL, "unique_class_id" character varying, "owner_id" character varying, CONSTRAINT "PK_f7c8a41b5a9d0e3eeb5ab3871b0" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_afece6c4021225065d4c4112e9" ON "unique_instance" ("unique_class_id") `)
     await db.query(`CREATE INDEX "IDX_aa027c94b1903ff9271fea05e0" ON "unique_instance" ("owner_id") `)
-    await db.query(`CREATE TABLE "historical_balance" ("id" character varying NOT NULL, "balance" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "account_id" character varying NOT NULL, CONSTRAINT "PK_74ac29ad0bdffb6d1281a1e17e8" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "historical_balance" ("id" character varying NOT NULL, "balance" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "account_id" character varying, CONSTRAINT "PK_74ac29ad0bdffb6d1281a1e17e8" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_383ff006e4b59db91d32cb891e" ON "historical_balance" ("account_id") `)
     await db.query(`CREATE TABLE "account" ("id" character varying NOT NULL, "wallet" text NOT NULL, "balance" numeric NOT NULL, CONSTRAINT "PK_54115ee388cdb6d86bb4bf5b2ea" PRIMARY KEY ("id"))`)
     await db.query(`CREATE UNIQUE INDEX "IDX_88b7476f4b8bbcec8defcaffbe" ON "account" ("wallet") `)
-    await db.query(`CREATE TABLE "asset_balance" ("id" character varying NOT NULL, "balance" numeric NOT NULL, "status" character varying(9) NOT NULL, "account_id" character varying NOT NULL, "asset_id" character varying NOT NULL, CONSTRAINT "PK_7ffc793d0d7d680c10e4741f173" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "asset_balance" ("id" character varying NOT NULL, "balance" numeric NOT NULL, "status" character varying(9) NOT NULL, "account_id" character varying, "asset_id" character varying, CONSTRAINT "PK_7ffc793d0d7d680c10e4741f173" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_55a3340913f4ffe21ffaa0e051" ON "asset_balance" ("account_id") `)
     await db.query(`CREATE INDEX "IDX_b3bbf183209c65d4306a85a06c" ON "asset_balance" ("asset_id") `)
     await db.query(`CREATE TABLE "asset" ("id" character varying NOT NULL, "name" text, "symbol" text, "freezer" text, "decimal" integer, "owner" text NOT NULL, "admin" text, "issuer" text, "creator" text, "min_balance" numeric, "status" character varying(9) NOT NULL, "total_supply" numeric, CONSTRAINT "PK_1209d107fe21482beaea51b745e" PRIMARY KEY ("id"))`)

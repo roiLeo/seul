@@ -115,7 +115,7 @@ type UniqueClass @entity {
   status: AssetStatus!
   instances: [UniqueInstance!] @derivedFrom(field: "uniqueClass")
   metadata: String
-  attributes: [Attribute!]!
+  attributes: [Attribute!]
 }
 
 type UniqueInstance @entity {
