@@ -42,6 +42,11 @@
 	"calls": [ 
 		"Timestamp.set",
 		"Assets.create"
+	],
+	"storage": [
+		"Uniques.Class",
+		"Uniques.InstanceMetadataOf",
+		"Uniques.Account"
 	]
   }
 

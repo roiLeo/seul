@@ -127,7 +127,7 @@ type UniqueInstance @entity {
   deposit: BigInt
   transfers: [UniqueTransfer!] @derivedFrom(field: "uniqueInstance")
   metadata: String
-  attributes: [Attribute!]!
+  attributes: [Attribute!]
 }
 
 type Attribute @jsonField {

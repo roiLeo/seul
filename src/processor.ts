@@ -11,7 +11,7 @@ processor.setDataSource({
     chain: 'wss://statemine-rpc.polkadot.io'
 })
 
-processor.setBlockRange({from: 338770});
+// processor.setBlockRange({from: 338599});		///ERROR AT BLOCK 338600 - no class created before metadataset
 
 processor.addEventHandler('Assets.Created', mappings.assetCreated);
 processor.addEventHandler('Assets.AssetFrozen', mappings.assetFrozen);

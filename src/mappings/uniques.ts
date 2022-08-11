@@ -13,7 +13,7 @@ import {
 } from "../model/generated";
 import { EntityConstructor } from "../types";
 import * as events from "../types/events";
-import { encodeId, get, getOrCreate, isAdressSS58 } from "./helpers/entity-utils";
+import { encodeId, get, getOrCreate, isAdressSS58, findClassInStorage } from "./helpers/entity-utils";
 
 /**
  * Must get entity from database
@@ -79,8 +79,6 @@ export async function uniqueClassCreated(ctx: EventHandlerContext<Store>) {
   const uniqueClass = new UniqueClass();
   let creator = isAdressSS58(creatorA) ? encodeId(creatorA) : null;
   let owner = isAdressSS58(ownerA) ? encodeId(ownerA) : null;
-  // assert(creator);
-  // assert(owner);
   uniqueClass.id = classId.toString();
   uniqueClass.creator = creator;
   uniqueClass.owner = owner;
@@ -114,7 +112,6 @@ export async function uniqueClassFrozen(ctx: EventHandlerContext<Store>) {
   else {
     throw event.constructor.name;
   }
-
   const class_ = await getOrCreate(ctx.store, UniqueClass, classId.toString());
 
   class_.status = AssetStatus.FREEZED;
@@ -428,10 +425,28 @@ export async function uniquesClassMetadataSet(ctx: EventHandlerContext<Store>) {
   else {
     throw event.constructor.name;
   }
-  const classProm = await getOrDie(ctx.store, UniqueClass, classId.toString());
+  // let classProm: UniqueClass | boolean
+  let classProm: any
+  try {
+    classProm = await getOrDie(ctx.store, UniqueClass, classId.toString());
+  } catch (e) {
+    classProm = await findClassInStorage(ctx, classId);
+    if (!classProm) return;
+  }
   classProm.metadata = hexToString(data.toString());
-  // classProm.status = isFrozen ? AssetStatus.FREEZED : AssetStatus.ACTIVE;
   await ctx.store.save(classProm);
+  const transfer = new UniqueTransfer();
+  transfer.uniqueClass = classProm;
+  transfer.blockHash = ctx.block.hash;
+  transfer.blockNum = ctx.block.height;
+  transfer.createdAt = new Date(ctx.block.timestamp);
+  transfer.extrinisicId = ctx.event.extrinsic?.id;
+  transfer.to = classProm.owner;
+  transfer.id = ctx.event.id;
+  transfer.type = TransferType.CREATED;
+  transfer.success = true;
+
+  await ctx.store.save(transfer);
 }
 
 export async function uniquesClassMetadataCleared(ctx: EventHandlerContext<Store>) {
@@ -445,7 +460,13 @@ export async function uniquesClassMetadataCleared(ctx: EventHandlerContext<Store
   else {
     throw event.constructor.name;
   }
-  const classProm = await getOrDie(ctx.store, UniqueClass, classId.toString());
+  let classProm: UniqueClass | boolean
+  try {
+    classProm = await getOrDie(ctx.store, UniqueClass, classId.toString());
+  } catch (e) {
+    classProm = await findClassInStorage(ctx, classId);
+    if (!classProm) return;
+  }
   classProm.metadata = null;
   await ctx.store.save(classProm);
 }
@@ -458,21 +479,32 @@ export async function uniquesCollectionMetadataSet(ctx: EventHandlerContext<Stor
   else {
     throw event.constructor.name;
   }
-  const classProm = await getOrDie(ctx.store, UniqueClass, collection.toString());
+  let classProm: UniqueClass | boolean
+  try {
+    classProm = await getOrDie(ctx.store, UniqueClass, collection.toString());
+  } catch (e) {
+    classProm = await findClassInStorage(ctx, collection);
+    if (!classProm) return;
+  }
   classProm.metadata = hexToString(data.toString());
-  // classProm.status = isFrozen ? AssetStatus.FREEZED : AssetStatus.ACTIVE;
   await ctx.store.save(classProm);
 }
 
 export async function uniquesCollectionMetadataCleared(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesCollectionMetadataClearedEvent(ctx);
   if (event.isV9230) {
-    var classId = event.asV9230;
+    var {collection} = event.asV9230;
   }
   else {
     throw event.constructor.name;
   }
-  const classProm = await getOrDie(ctx.store, UniqueClass, classId.toString());
+  let classProm: UniqueClass | boolean
+  try {
+    classProm = await getOrDie(ctx.store, UniqueClass, collection.toString());
+  } catch (e) {
+    classProm = await findClassInStorage(ctx, collection);
+    if (!classProm) return;
+  }
   classProm.metadata = null;
   await ctx.store.save(classProm);
 }
@@ -492,11 +524,13 @@ export async function uniquesMetadataSet(ctx: EventHandlerContext<Store>) {
     throw event.constructor.name;
   }
   let instanceId = classId.toString() + '-' + instance.toString();
+  let inst: UniqueInstance | boolean
   try {
-    var inst = await getOrDie(ctx.store, UniqueInstance, instanceId);
-  }
-  catch (e) {
-    return;
+    inst = await getOrDie(ctx.store, UniqueInstance, instance.toString());
+  } catch (e) {
+    return
+    // inst = await findInstanceInStorage(ctx, classId);
+    // if (!inst) return;
   }
   inst.metadata = hexToString(data.toString());
   await ctx.store.save(inst);
@@ -541,19 +575,21 @@ export async function uniquesAttributeSet(ctx: EventHandlerContext<Store>) {
   else {
     throw event.constructor.name;
   }
-
+  let classProm: UniqueClass | boolean | UniqueInstance
   try {
-    var classOrInstance = instance ? await getOrDie(ctx.store, UniqueInstance, classId.toString() + '-' + instance.toString()) :
+    classProm = instance ? await getOrDie(ctx.store, UniqueInstance, classId.toString() + '-' + instance.toString()) :
                                    await getOrDie(ctx.store, UniqueClass, classId.toString());
   }
   catch (e) {
-    return
+    if (instance) return;
+    classProm = await findClassInStorage(ctx, classId);
+    if (!classProm) return;
   }
 
-  let attrIndex = classOrInstance.attributes?.findIndex(attr => attr.key == key.toString());
-  if (attrIndex && classOrInstance.attributes && classOrInstance.attributes.length && attrIndex !== -1) classOrInstance.attributes[attrIndex].value = value.toString();
-  else classOrInstance.attributes?.push( new Attribute({key: key.toString(), value: value.toString()}) );
-  await ctx.store.save(classOrInstance);
+  let attrIndex = classProm.attributes?.findIndex(attr => attr.key == key.toString());
+  if (attrIndex && classProm.attributes && classProm.attributes.length && attrIndex !== -1) classProm.attributes[attrIndex].value = value.toString();
+  else classProm.attributes?.push( new Attribute({key: key.toString(), value: value.toString()}) );
+  await ctx.store.save(classProm);
 }
 
 export async function uniquesAttributeCleared(ctx: EventHandlerContext<Store>) {
@@ -570,15 +606,18 @@ export async function uniquesAttributeCleared(ctx: EventHandlerContext<Store>) {
   else {
     throw event.constructor.name;
   }
+  let classProm: UniqueClass | boolean | UniqueInstance
   try {
-    var classOrInstance = instance ? await getOrDie(ctx.store, UniqueInstance, classId.toString() + '-' + instance.toString()) :
-                                    await getOrDie(ctx.store, UniqueClass, classId.toString());
+    classProm = instance ? await getOrDie(ctx.store, UniqueInstance, classId.toString() + '-' + instance.toString()) :
+                                   await getOrDie(ctx.store, UniqueClass, classId.toString());
   }
   catch (e) {
-    return
+    if (instance) return;
+    classProm = await findClassInStorage(ctx, classId);
+    if (!classProm) return;
   }
-  classOrInstance.attributes?.filter(attr => attr.key != key.toString());
-  await ctx.store.save(classOrInstance);
+  classProm.attributes?.filter(attr => attr.key != key.toString());
+  await ctx.store.save(classProm);
 }
 
 export async function uniquesTeamChanged(ctx: EventHandlerContext<Store>) {

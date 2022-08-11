@@ -26,3 +26,22 @@ export interface LookupSource_Address20 {
   __kind: 'Address20'
   value: Uint8Array
 }
+
+export interface ClassDetails {
+  owner: Uint8Array
+  issuer: Uint8Array
+  admin: Uint8Array
+  freezer: Uint8Array
+  totalDeposit: bigint
+  freeHolding: boolean
+  instances: number
+  instanceMetadatas: number
+  attributes: number
+  isFrozen: boolean
+}
+
+export interface InstanceMetadata {
+  deposit: bigint
+  data: Uint8Array
+  isFrozen: boolean
+}

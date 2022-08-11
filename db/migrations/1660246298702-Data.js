@@ -1,5 +1,5 @@
-module.exports = class Data1659542489583 {
-  name = 'Data1659542489583'
+module.exports = class Data1660246298702 {
+  name = 'Data1660246298702'
 
   async up(db) {
     await db.query(`CREATE TABLE "transfer" ("id" character varying NOT NULL, "amount" numeric, "to" text, "from" text, "delegator" text, "fee" numeric, "type" character varying(9) NOT NULL, "extrinisic_id" text, "success" boolean NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "block_hash" text NOT NULL, "block_num" integer NOT NULL, "asset_id" character varying, CONSTRAINT "PK_fd9ddbdd49a17afcbe014401295" PRIMARY KEY ("id"))`)
@@ -8,7 +8,7 @@ module.exports = class Data1659542489583 {
     await db.query(`CREATE TABLE "unique_transfer" ("id" character varying NOT NULL, "to" text, "from" text, "delegator" text, "fee" numeric, "type" character varying(9) NOT NULL, "extrinisic_id" text, "success" boolean NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "block_hash" text NOT NULL, "block_num" integer NOT NULL, "unique_class_id" character varying, "unique_instance_id" character varying, CONSTRAINT "PK_7d6ae97266747834d3e832cb8fc" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_008d9f4e0b30b62b439b092d21" ON "unique_transfer" ("unique_class_id") `)
     await db.query(`CREATE INDEX "IDX_09165fa651ab2faa61f64c8891" ON "unique_transfer" ("unique_instance_id") `)
-    await db.query(`CREATE TABLE "unique_instance" ("id" character varying NOT NULL, "inner_id" text NOT NULL, "status" character varying(9) NOT NULL, "deposit" numeric, "metadata" text, "attributes" jsonb NOT NULL, "unique_class_id" character varying, "owner_id" character varying, CONSTRAINT "PK_f7c8a41b5a9d0e3eeb5ab3871b0" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "unique_instance" ("id" character varying NOT NULL, "inner_id" text NOT NULL, "status" character varying(9) NOT NULL, "deposit" numeric, "metadata" text, "attributes" jsonb, "unique_class_id" character varying, "owner_id" character varying, CONSTRAINT "PK_f7c8a41b5a9d0e3eeb5ab3871b0" PRIMARY KEY ("id"))`)
     await db.query(`CREATE INDEX "IDX_afece6c4021225065d4c4112e9" ON "unique_instance" ("unique_class_id") `)
     await db.query(`CREATE INDEX "IDX_aa027c94b1903ff9271fea05e0" ON "unique_instance" ("owner_id") `)
     await db.query(`CREATE TABLE "historical_balance" ("id" character varying NOT NULL, "balance" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "account_id" character varying, CONSTRAINT "PK_74ac29ad0bdffb6d1281a1e17e8" PRIMARY KEY ("id"))`)
