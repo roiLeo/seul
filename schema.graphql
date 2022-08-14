@@ -13,6 +13,16 @@ enum TransferType {
   THAWED
   CREATED
   DESTROYED
+  METADATASET
+  METADATACLEAR
+  CLASSMETADATASET
+  CLASSMETADATACLEAR
+  COLLECTIONMETADATASET
+  COLLECTIONMETADATACLEAR
+  ATTRIBUTESET
+  ATTRIBUTECLEAR
+  TEAMCHANGED
+  OWNERCHANGED
 }
 
 type Asset @entity {
@@ -114,6 +124,7 @@ type UniqueClass @entity {
   name: String
   status: AssetStatus!
   instances: [UniqueInstance!] @derivedFrom(field: "uniqueClass")
+  transfers: [UniqueTransfer!] @derivedFrom(field: "uniqueClass")
   metadata: String
   attributes: [Attribute!]
 }

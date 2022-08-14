@@ -2,6 +2,7 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, O
 import * as marshal from "./marshal"
 import {AssetStatus} from "./_assetStatus"
 import {UniqueInstance} from "./uniqueInstance.model"
+import {UniqueTransfer} from "./uniqueTransfer.model"
 import {Attribute} from "./_attribute"
 
 @Entity_()
@@ -39,6 +40,9 @@ export class UniqueClass {
 
   @OneToMany_(() => UniqueInstance, e => e.uniqueClass)
   instances!: UniqueInstance[]
+
+  @OneToMany_(() => UniqueTransfer, e => e.uniqueClass)
+  transfers!: UniqueTransfer[]
 
   @Column_("text", {nullable: true})
   metadata!: string | undefined | null

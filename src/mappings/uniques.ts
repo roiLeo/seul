@@ -443,7 +443,7 @@ export async function uniquesClassMetadataSet(ctx: EventHandlerContext<Store>) {
   transfer.extrinisicId = ctx.event.extrinsic?.id;
   transfer.to = classProm.owner;
   transfer.id = ctx.event.id;
-  transfer.type = TransferType.CREATED;
+  transfer.type = TransferType.CLASSMETADATASET;
   transfer.success = true;
 
   await ctx.store.save(transfer);
@@ -469,7 +469,19 @@ export async function uniquesClassMetadataCleared(ctx: EventHandlerContext<Store
   }
   classProm.metadata = null;
   await ctx.store.save(classProm);
-}
+
+  const transfer = new UniqueTransfer();
+  transfer.uniqueClass = classProm;
+  transfer.blockHash = ctx.block.hash;
+  transfer.blockNum = ctx.block.height;
+  transfer.createdAt = new Date(ctx.block.timestamp);
+  transfer.extrinisicId = ctx.event.extrinsic?.id;
+  transfer.to = classProm.owner;
+  transfer.id = ctx.event.id;
+  transfer.type = TransferType.CLASSMETADATACLEAR;
+  transfer.success = true;
+
+  await ctx.store.save(transfer);}
 
 export async function uniquesCollectionMetadataSet(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesCollectionMetadataSetEvent(ctx);
@@ -488,6 +500,18 @@ export async function uniquesCollectionMetadataSet(ctx: EventHandlerContext<Stor
   }
   classProm.metadata = hexToString(data.toString());
   await ctx.store.save(classProm);
+  const transfer = new UniqueTransfer();
+  transfer.uniqueClass = classProm;
+  transfer.blockHash = ctx.block.hash;
+  transfer.blockNum = ctx.block.height;
+  transfer.createdAt = new Date(ctx.block.timestamp);
+  transfer.extrinisicId = ctx.event.extrinsic?.id;
+  transfer.to = classProm.owner;
+  transfer.id = ctx.event.id;
+  transfer.type = TransferType.COLLECTIONMETADATASET;
+  transfer.success = true;
+
+  await ctx.store.save(transfer);
 }
 
 export async function uniquesCollectionMetadataCleared(ctx: EventHandlerContext<Store>) {
@@ -507,6 +531,18 @@ export async function uniquesCollectionMetadataCleared(ctx: EventHandlerContext<
   }
   classProm.metadata = null;
   await ctx.store.save(classProm);
+  const transfer = new UniqueTransfer();
+  transfer.uniqueClass = classProm;
+  transfer.blockHash = ctx.block.hash;
+  transfer.blockNum = ctx.block.height;
+  transfer.createdAt = new Date(ctx.block.timestamp);
+  transfer.extrinisicId = ctx.event.extrinsic?.id;
+  transfer.to = classProm.owner;
+  transfer.id = ctx.event.id;
+  transfer.type = TransferType.COLLECTIONMETADATACLEAR;
+  transfer.success = true;
+
+  await ctx.store.save(transfer);
 }
 
 export async function uniquesMetadataSet(ctx: EventHandlerContext<Store>) {
@@ -523,7 +559,8 @@ export async function uniquesMetadataSet(ctx: EventHandlerContext<Store>) {
   else {
     throw event.constructor.name;
   }
-  let instanceId = classId.toString() + '-' + instance.toString();
+  let classProm = await getOrDie(ctx.store, UniqueClass, classId.toString());
+  // let instanceId = classId.toString() + '-' + instance.toString();
   let inst: UniqueInstance | boolean
   try {
     inst = await getOrDie(ctx.store, UniqueInstance, instance.toString());
@@ -534,6 +571,18 @@ export async function uniquesMetadataSet(ctx: EventHandlerContext<Store>) {
   }
   inst.metadata = hexToString(data.toString());
   await ctx.store.save(inst);
+  const transfer = new UniqueTransfer();
+  transfer.uniqueClass = classProm;
+  transfer.blockHash = ctx.block.hash;
+  transfer.blockNum = ctx.block.height;
+  transfer.createdAt = new Date(ctx.block.timestamp);
+  transfer.extrinisicId = ctx.event.extrinsic?.id;
+  transfer.to = classProm.owner;
+  transfer.id = ctx.event.id;
+  transfer.type = TransferType.METADATASET;
+  transfer.success = true;
+
+  await ctx.store.save(transfer);
 }
 
 export async function uniquesMetadataCleared(ctx: EventHandlerContext<Store>) {
@@ -550,6 +599,7 @@ export async function uniquesMetadataCleared(ctx: EventHandlerContext<Store>) {
   else {
     throw event.constructor.name;
   }
+  let classProm = await getOrDie(ctx.store, UniqueClass, classId.toString());
   let instanceId = classId.toString() + '-' + instance.toString();
   try {
     var inst = await getOrDie(ctx.store, UniqueInstance, instanceId);
@@ -559,6 +609,18 @@ export async function uniquesMetadataCleared(ctx: EventHandlerContext<Store>) {
   }
   inst.metadata = null;
   await ctx.store.save(inst);
+  const transfer = new UniqueTransfer();
+  transfer.uniqueClass = classProm;
+  transfer.blockHash = ctx.block.hash;
+  transfer.blockNum = ctx.block.height;
+  transfer.createdAt = new Date(ctx.block.timestamp);
+  transfer.extrinisicId = ctx.event.extrinsic?.id;
+  transfer.to = classProm.owner;
+  transfer.id = ctx.event.id;
+  transfer.type = TransferType.METADATACLEAR;
+  transfer.success = true;
+
+  await ctx.store.save(transfer);
 }
 
 export async function uniquesAttributeSet(ctx: EventHandlerContext<Store>) {
@@ -576,13 +638,16 @@ export async function uniquesAttributeSet(ctx: EventHandlerContext<Store>) {
     throw event.constructor.name;
   }
   let classProm: UniqueClass | boolean | UniqueInstance
+  let classCopy;
   try {
-    classProm = instance ? await getOrDie(ctx.store, UniqueInstance, classId.toString() + '-' + instance.toString()) :
-                                   await getOrDie(ctx.store, UniqueClass, classId.toString());
+    classProm = await getOrDie(ctx.store, UniqueClass, classId.toString());
+    classCopy = classProm;
+    instance && (classProm = await getOrDie(ctx.store, UniqueInstance, classId.toString() + '-' + instance.toString()))
   }
   catch (e) {
     if (instance) return;
     classProm = await findClassInStorage(ctx, classId);
+    classProm && (classCopy = classProm);
     if (!classProm) return;
   }
 
@@ -590,6 +655,18 @@ export async function uniquesAttributeSet(ctx: EventHandlerContext<Store>) {
   if (attrIndex && classProm.attributes && classProm.attributes.length && attrIndex !== -1) classProm.attributes[attrIndex].value = value.toString();
   else classProm.attributes?.push( new Attribute({key: key.toString(), value: value.toString()}) );
   await ctx.store.save(classProm);
+  const transfer = new UniqueTransfer();
+  transfer.uniqueClass = classCopy;
+  transfer.blockHash = ctx.block.hash;
+  transfer.blockNum = ctx.block.height;
+  transfer.createdAt = new Date(ctx.block.timestamp);
+  transfer.extrinisicId = ctx.event.extrinsic?.id;
+  classCopy && (transfer.to = classCopy.owner);
+  transfer.id = ctx.event.id;
+  transfer.type = TransferType.ATTRIBUTESET;
+  transfer.success = true;
+
+  await ctx.store.save(transfer);
 }
 
 export async function uniquesAttributeCleared(ctx: EventHandlerContext<Store>) {
@@ -607,17 +684,32 @@ export async function uniquesAttributeCleared(ctx: EventHandlerContext<Store>) {
     throw event.constructor.name;
   }
   let classProm: UniqueClass | boolean | UniqueInstance
+  let classCopy;
   try {
-    classProm = instance ? await getOrDie(ctx.store, UniqueInstance, classId.toString() + '-' + instance.toString()) :
-                                   await getOrDie(ctx.store, UniqueClass, classId.toString());
+    classProm = await getOrDie(ctx.store, UniqueClass, classId.toString());
+    classCopy = classProm;
+    instance && (classProm = await getOrDie(ctx.store, UniqueInstance, classId.toString() + '-' + instance.toString()))
   }
   catch (e) {
     if (instance) return;
     classProm = await findClassInStorage(ctx, classId);
+    classProm && (classCopy = classProm);
     if (!classProm) return;
   }
   classProm.attributes?.filter(attr => attr.key != key.toString());
   await ctx.store.save(classProm);
+  const transfer = new UniqueTransfer();
+  transfer.uniqueClass = classCopy;
+  transfer.blockHash = ctx.block.hash;
+  transfer.blockNum = ctx.block.height;
+  transfer.createdAt = new Date(ctx.block.timestamp);
+  transfer.extrinisicId = ctx.event.extrinsic?.id;
+  classCopy && (transfer.to = classCopy.owner);
+  transfer.id = ctx.event.id;
+  transfer.type = TransferType.ATTRIBUTECLEAR;
+  transfer.success = true;
+
+  await ctx.store.save(transfer);
 }
 
 export async function uniquesTeamChanged(ctx: EventHandlerContext<Store>) {
@@ -643,6 +735,18 @@ export async function uniquesTeamChanged(ctx: EventHandlerContext<Store>) {
   instanceClass.admin = admin;
   instanceClass.freezer = freezer;
   await ctx.store.save(instanceClass);
+  const transfer = new UniqueTransfer();
+  transfer.uniqueClass = instanceClass;
+  transfer.blockHash = ctx.block.hash;
+  transfer.blockNum = ctx.block.height;
+  transfer.createdAt = new Date(ctx.block.timestamp);
+  transfer.extrinisicId = ctx.event.extrinsic?.id;
+  transfer.to = instanceClass.owner;
+  transfer.id = ctx.event.id;
+  transfer.type = TransferType.TEAMCHANGED;
+  transfer.success = true;
+
+  await ctx.store.save(transfer);
 }
 
 export async function uniquesOwnerChanged(ctx: EventHandlerContext<Store>) {
@@ -663,6 +767,18 @@ export async function uniquesOwnerChanged(ctx: EventHandlerContext<Store>) {
   let instanceClass = await getOrDie(ctx.store, UniqueClass, classId.toString());
   instanceClass.owner = newOwner;
   await ctx.store.save(instanceClass);
+  const transfer = new UniqueTransfer();
+  transfer.uniqueClass = instanceClass;
+  transfer.blockHash = ctx.block.hash;
+  transfer.blockNum = ctx.block.height;
+  transfer.createdAt = new Date(ctx.block.timestamp);
+  transfer.extrinisicId = ctx.event.extrinsic?.id;
+  transfer.to = instanceClass.owner;
+  transfer.id = ctx.event.id;
+  transfer.type = TransferType.OWNERCHANGED;
+  transfer.success = true;
+
+  await ctx.store.save(transfer);
 }
 
 

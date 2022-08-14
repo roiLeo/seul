@@ -33,7 +33,7 @@ export class UniqueTransfer {
   @ManyToOne_(() => UniqueInstance, {nullable: true})
   uniqueInstance!: UniqueInstance | undefined | null
 
-  @Column_("varchar", {length: 9, nullable: false})
+  @Column_("varchar", {length: 23, nullable: false})
   type!: TransferType
 
   @Column_("text", {nullable: true})
