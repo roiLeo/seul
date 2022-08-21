@@ -110,7 +110,6 @@ type UniqueTransfer implements TransferBase @entity {
   createdAt: DateTime!
   blockHash: String!
   blockNum: Int!
-  # meta: MetadataEntity
 }
 
 type UniqueClass @entity {
