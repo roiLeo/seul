@@ -112,7 +112,7 @@ export async function assetCreated(ctx: EventHandlerContext<Store, {event: true}
   assert(ctx.event.call);
   try {
     const call = new AssetsCreateCall(ctx, ctx.event.call);
-    const {id, admin, minBalance} = call.asV504;
+    const {id, admin, minBalance} = call.asV500;
     asset.minBalance = minBalance;  // параметр колла event.call.args;
   }
   catch (err) {

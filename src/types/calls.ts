@@ -1,7 +1,7 @@
 import assert from 'assert'
 import {Chain, ChainContext, CallContext, Call, Result} from './support'
 import * as v1 from './v1'
-import * as v504 from './v504'
+import * as v500 from './v500'
 
 export class AssetsCreateCall {
   private readonly _chain: Chain
@@ -88,7 +88,7 @@ export class AssetsCreateCall {
    * 
    * Weight: `O(1)`
    */
-  get isV504(): boolean {
+  get isV500(): boolean {
     return this._chain.getCallHash('Assets.create') === 'ca0409e022ec3c668d76f1f4814f288ffed58f980abfd6a87d4e15686ab290f0'
   }
 
@@ -113,8 +113,8 @@ export class AssetsCreateCall {
    * 
    * Weight: `O(1)`
    */
-  get asV504(): {id: number, admin: v504.MultiAddress, minBalance: bigint} {
-    assert(this.isV504)
+  get asV500(): {id: number, admin: v500.MultiAddress, minBalance: bigint} {
+    assert(this.isV500)
     return this._chain.decodeCall(this.call)
   }
 }

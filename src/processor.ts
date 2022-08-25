@@ -5,10 +5,11 @@ import * as mappings from "./mappings"
 
 const processor = new SubstrateBatchProcessor()
 
+processor.setTypesBundle('westmint')
 processor.setBatchSize(500);
 processor.setDataSource({
-    archive: 'https://statemine.archive.subsquid.io/graphql', 
-    chain: 'wss://statemine-rpc.polkadot.io'
+    archive: 'http://localhost:4444/graphql', 
+    chain: 'wss://westmint-rpc.polkadot.io'
 })
 
 // processor.setBlockRange({from: 338599});		///ERROR AT BLOCK 338600 - no class created before metadataset
@@ -107,6 +108,12 @@ processor.addEvent('Uniques.AttributeSet', {
 	data: {event: {args: true}}
 } as const);
 processor.addEvent('Uniques.AttributeCleared', {
+	data: {event: {args: true}}
+} as const);
+processor.addEvent('Uniques.ItemBought', {
+	data: {event: {args: true}}
+} as const);
+processor.addEvent('Uniques.ItemPriceSet', {
 	data: {event: {args: true}}
 } as const);
 
@@ -259,6 +266,14 @@ async function processEventItems(ctx: EventHandlerContext<Store, {event: true}>)
 		}
 		case 'Uniques.AttributeCleared': {
 			await mappings.uniquesAttributeCleared(ctx);
+			break;
+		}
+		case 'Uniques.ItemBought': {
+			await mappings.uniquesItemBought(ctx);
+			break;
+		}
+		case 'Uniques.ItemPriceSet': {
+			await mappings.uniquesItemPriceSet(ctx);
 			break;
 		}
 	}

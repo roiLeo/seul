@@ -3,7 +3,7 @@ import { EntityConstructor, WhereCondition } from "../../types";
 import * as ss58 from '@subsquid/ss58'
 import { EventHandlerContext } from "@subsquid/substrate-processor";
 import * as storage from "../../types/storage";
-import { ClassDetails, InstanceMetadata } from "../../types/v1";
+import { ClassDetails, InstanceMetadata } from "../../types/v3";
 import { CollectionDetails } from "../../types/v9230";
 import { AssetStatus, UniqueClass, UniqueInstance } from "../../model/generated";
 
@@ -52,8 +52,8 @@ export function isAdressSS58(address: Uint8Array) {
 export async function findClassInStorage(ctx: EventHandlerContext<Store>, classId: number) {
   let classSt = new storage.UniquesClassStorage(ctx);
   let classStorage: ClassDetails | CollectionDetails | undefined;
-  if (classSt.isV1) {
-    classStorage = await classSt.getAsV1(classId);
+  if (classSt.isV3) {
+    classStorage = await classSt.getAsV3(classId);
   }
   else if (classSt.isV9230) {
     classStorage = await classSt.getAsV9230(classId);

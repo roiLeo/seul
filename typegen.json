@@ -1,10 +1,8 @@
 {
 	"outDir": "src/types",
-	"specVersions": "https://statemine.archive.subsquid.io/graphql", 
-	"typesBundle": "statemine", 
-	"events": [ 
-		"Balances.Transfer",
-		"Balances.Deposit",
+	"specVersions": "http://localhost:4444/graphql", 
+	"typesBundle": "./bundles/statemint.json", 
+	"events": [
 		"Assets.Created",
 		"Assets.MetadataSet",
 		"Assets.MetadataCleared",
@@ -37,7 +35,9 @@
 		"Uniques.CollectionMetadataSet",
 		"Uniques.CollectionMetadataCleared",
 		"Uniques.AttributeSet",
-		"Uniques.AttributeCleared"
+		"Uniques.AttributeCleared",
+		"Uniques.ItemBought",
+		"Uniques.ItemPriceSet"
 	],
 	"calls": [ 
 		"Timestamp.set",

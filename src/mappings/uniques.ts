@@ -64,8 +64,8 @@ export function getInstanceGlobalId(
 
 export async function uniqueClassCreated(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesCreatedEvent(ctx);
-  if (event.isV1) {
-    var [classId, creatorA, ownerA] = event.asV1;
+  if (event.isV3) {
+    var [classId, creatorA, ownerA] = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId, creator: creatorA, owner: ownerA} = event.asV700;
@@ -103,8 +103,8 @@ export async function uniqueClassCreated(ctx: EventHandlerContext<Store>) {
 
 export async function uniqueClassFrozen(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesClassFrozenEvent(ctx);
-  if (event.isV1) {
-    var classId = event.asV1;
+  if (event.isV3) {
+    var classId = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId} = event.asV700; 
@@ -132,8 +132,8 @@ export async function uniqueClassFrozen(ctx: EventHandlerContext<Store>) {
 
 export async function uniqueClassThawed(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesClassThawedEvent(ctx);
-  if (event.isV1) {
-    var classId = event.asV1;
+  if (event.isV3) {
+    var classId = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId} = event.asV700;
@@ -161,8 +161,8 @@ export async function uniqueClassThawed(ctx: EventHandlerContext<Store>) {
 
 export async function uniqueClassDestroyed(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesDestroyedEvent(ctx);
-  if (event.isV1) {
-    var classId = event.asV1;
+  if (event.isV3) {
+    var classId = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId} = event.asV700;
@@ -193,8 +193,8 @@ export async function uniqueClassDestroyed(ctx: EventHandlerContext<Store>) {
 
 export async function uniqueInstanceIssued(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesIssuedEvent(ctx);
-  if (event.isV1) {
-    var [classId, instance, ownerA] = event.asV1;
+  if (event.isV3) {
+    var [classId, instance, ownerA] = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId, instance, owner: ownerA} = event.asV700;
@@ -231,6 +231,7 @@ export async function uniqueInstanceIssued(ctx: EventHandlerContext<Store>) {
   uniqueInstance.uniqueClass = class_;
   uniqueInstance.status = AssetStatus.ACTIVE;
   uniqueInstance.attributes = [];
+  uniqueInstance.price = BigInt(0);
 
   await ctx.store.save(uniqueInstance);
 
@@ -251,8 +252,8 @@ export async function uniqueInstanceIssued(ctx: EventHandlerContext<Store>) {
 
 export async function uniqueInstanceTransferred(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesTransferredEvent(ctx);
-  if (event.isV1) {
-    var [classId, instance, fromA, toA] = event.asV1;
+  if (event.isV3) {
+    var [classId, instance, fromA, toA] = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId, instance, from: fromA, to: toA} = event.asV700;
@@ -299,8 +300,8 @@ export async function uniqueInstanceTransferred(ctx: EventHandlerContext<Store>)
 
 export async function uniqueInstanceBurned(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesBurnedEvent(ctx);
-  if (event.isV1) {
-    var [classId, instance, ownerA] = event.asV1;
+  if (event.isV3) {
+    var [classId, instance, ownerA] = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId, instance, owner: ownerA} = event.asV700;
@@ -338,8 +339,8 @@ export async function uniqueInstanceBurned(ctx: EventHandlerContext<Store>) {
 
 export async function uniqueInstanceFrozen(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesFrozenEvent(ctx);
-  if (event.isV1) {
-    var [classId, instance] = event.asV1;
+  if (event.isV3) {
+    var [classId, instance] = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId, instance} = event.asV700;
@@ -377,8 +378,8 @@ export async function uniqueInstanceFrozen(ctx: EventHandlerContext<Store>) {
 
 export async function uniqueInstanceThawed(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesThawedEvent(ctx);
-  if (event.isV1) {
-    var [classId, instance] = event.asV1;
+  if (event.isV3) {
+    var [classId, instance] = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId, instance} = event.asV700;
@@ -416,8 +417,8 @@ export async function uniqueInstanceThawed(ctx: EventHandlerContext<Store>) {
 
 export async function uniquesClassMetadataSet(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesClassMetadataSetEvent(ctx);
-  if (event.isV1) {
-    var [classId, data, isFrozen] = event.asV1;
+  if (event.isV3) {
+    var [classId, data, isFrozen] = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId, data, isFrozen} = event.asV700;
@@ -451,8 +452,8 @@ export async function uniquesClassMetadataSet(ctx: EventHandlerContext<Store>) {
 
 export async function uniquesClassMetadataCleared(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesClassMetadataClearedEvent(ctx);
-  if (event.isV1) {
-    var classId = event.asV1;
+  if (event.isV3) {
+    var classId = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId} = event.asV700;
@@ -547,8 +548,8 @@ export async function uniquesCollectionMetadataCleared(ctx: EventHandlerContext<
 
 export async function uniquesMetadataSet(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesMetadataSetEvent(ctx);
-  if (event.isV1) {
-    var [classId, instance, data, isFrozen] = event.asV1;
+  if (event.isV3) {
+    var [classId, instance, data, isFrozen] = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId, instance, data, isFrozen} = event.asV700;
@@ -587,8 +588,8 @@ export async function uniquesMetadataSet(ctx: EventHandlerContext<Store>) {
 
 export async function uniquesMetadataCleared(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesMetadataClearedEvent(ctx);
-  if (event.isV1) {
-    var [classId, instance] = event.asV1;
+  if (event.isV3) {
+    var [classId, instance] = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId, instance} = event.asV700;
@@ -625,8 +626,8 @@ export async function uniquesMetadataCleared(ctx: EventHandlerContext<Store>) {
 
 export async function uniquesAttributeSet(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesAttributeSetEvent(ctx);
-  if (event.isV1) {
-    var [classId, instance, key, value] = event.asV1;
+  if (event.isV3) {
+    var [classId, instance, key, value] = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId, maybeInstance: instance, key, value} = event.asV700;
@@ -671,8 +672,8 @@ export async function uniquesAttributeSet(ctx: EventHandlerContext<Store>) {
 
 export async function uniquesAttributeCleared(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesAttributeClearedEvent(ctx);
-  if (event.isV1) {
-    var [classId, instance, key] = event.asV1;
+  if (event.isV3) {
+    var [classId, instance, key] = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId, maybeInstance: instance, key} = event.asV700;
@@ -714,8 +715,8 @@ export async function uniquesAttributeCleared(ctx: EventHandlerContext<Store>) {
 
 export async function uniquesTeamChanged(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesTeamChangedEvent(ctx);
-  if (event.isV1) {
-    var [classId, issuerA, adminA, freezerA] = event.asV1;
+  if (event.isV3) {
+    var [classId, issuerA, adminA, freezerA] = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId, issuer: issuerA, admin: adminA, freezer: freezerA} = event.asV700;
@@ -751,8 +752,8 @@ export async function uniquesTeamChanged(ctx: EventHandlerContext<Store>) {
 
 export async function uniquesOwnerChanged(ctx: EventHandlerContext<Store>) {
   let event = new events.UniquesOwnerChangedEvent(ctx);
-  if (event.isV1) {
-    var [classId, newOwnerA] = event.asV1;
+  if (event.isV3) {
+    var [classId, newOwnerA] = event.asV3;
   }
   else if (event.isV700) {
     var {class: classId, newOwner: newOwnerA} = event.asV700;
@@ -781,6 +782,67 @@ export async function uniquesOwnerChanged(ctx: EventHandlerContext<Store>) {
   await ctx.store.save(transfer);
 }
 
+export async function uniquesItemBought(ctx: EventHandlerContext<Store>) {
+  let event = new events.UniquesItemBoughtEvent(ctx);
+
+  if (event.isV9270) {
+    var {collection, item, price, seller, buyer} = event.asV9270;
+  }
+  else {
+    throw event.constructor.name;
+  }
+
+  let encodedBuyer = encodeId(buyer)
+  let newOwner = await getAccountByWallet(ctx.store, encodedBuyer);
+  let inst = await getOrDie(ctx.store, UniqueInstance, item.toString());
+  inst.owner = newOwner;
+  inst.price = BigInt(0);
+  inst.status = AssetStatus.ACTIVE;
+  await ctx.store.save(inst);
+
+  let classProm = await getOrDie(ctx.store, UniqueClass, collection.toString());
+  const transfer = new UniqueTransfer();
+  transfer.uniqueClass = classProm;
+  transfer.blockHash = ctx.block.hash;
+  transfer.blockNum = ctx.block.height;
+  transfer.createdAt = new Date(ctx.block.timestamp);
+  transfer.extrinisicId = ctx.event.extrinsic?.id;
+  transfer.to = encodedBuyer;
+  transfer.id = ctx.event.id;
+  transfer.type = TransferType.ITEM_BOUGHT;
+  transfer.success = true;
+  await ctx.store.save(transfer);
+}
+
+
+export async function uniquesItemPriceSet(ctx: EventHandlerContext<Store>) {
+  let event = new events.UniquesItemPriceSetEvent(ctx);
+
+  if (event.isV9270) {
+    var {collection, item, price, whitelistedBuyer} = event.asV9270;
+  }
+  else {
+    throw event.constructor.name;
+  }
+
+  let inst = await getOrDie(ctx.store, UniqueInstance, item.toString());
+  inst.price = BigInt(price);
+  inst.status = AssetStatus.LISTED;
+  await ctx.store.save(inst);
+
+  const transfer = new UniqueTransfer();
+  let classProm = await getOrDie(ctx.store, UniqueClass, collection.toString());
+  transfer.uniqueClass = classProm;
+  transfer.blockHash = ctx.block.hash;
+  transfer.blockNum = ctx.block.height;
+  transfer.createdAt = new Date(ctx.block.timestamp);
+  transfer.extrinisicId = ctx.event.extrinsic?.id;
+  transfer.to = classProm.owner;
+  transfer.id = ctx.event.id;
+  transfer.type = TransferType.ITEM_PRICESET;
+  transfer.success = true;
+  await ctx.store.save(transfer);
+}
 
 function hexToString(text: string) {
 	return text.startsWith('0x') ? Buffer.from(text.replace(/^0x/, ''), 'hex').toString() : text 

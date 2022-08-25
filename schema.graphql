@@ -2,6 +2,7 @@ enum AssetStatus {
   ACTIVE
   FREEZED
   DESTROYED
+  LISTED
 }
 
 enum TransferType {
@@ -23,6 +24,8 @@ enum TransferType {
   ATTRIBUTECLEAR
   TEAMCHANGED
   OWNERCHANGED
+  ITEM_BOUGHT
+  ITEM_PRICESET
 }
 
 type Asset @entity {
@@ -138,6 +141,7 @@ type UniqueInstance @entity {
   transfers: [UniqueTransfer!] @derivedFrom(field: "uniqueInstance")
   metadata: String
   attributes: [Attribute!]
+  price: BigInt!
 }
 
 type Attribute @jsonField {
