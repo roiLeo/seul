@@ -1,0 +1,36 @@
+import { EventHandlerContext } from '@subsquid/substrate-processor'
+import { Store } from '@subsquid/typeorm-store'
+import { EventType, Status } from '../../model/generated'
+import * as events from '../../types/events'
+import {
+  IUniquesClassId,
+  processClassStateChange,
+} from '../helpers'
+
+function getUniquesClassFrozenData(
+  ctx: EventHandlerContext<Store>
+): IUniquesClassId {
+  const event = new events.UniquesClassFrozenEvent(ctx)
+  if (event.isV1) {
+    const classId = event.asV1
+    return { classId }
+  }
+  if (event.isV700) {
+    const { class: classId } = event.asV700
+    return { classId }
+  }
+
+  ctx.log.warn('USING UNSAFE GETTER! PLS UPDATE TYPES!')
+  const { class: classId } = ctx._chain.decodeEvent(ctx.event)
+  return { classId }
+}
+
+export const uniqueClassFrozen = (
+  ctx: EventHandlerContext<Store>
+): Promise<void> =>
+  processClassStateChange(
+    ctx,
+    getUniquesClassFrozenData,
+    Status.FROZEN,
+    EventType.FREEZE
+  )

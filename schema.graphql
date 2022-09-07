@@ -1,151 +1,88 @@
-enum AssetStatus {
+enum Status {
   ACTIVE
-  FREEZED
+  FROZEN
   DESTROYED
   LISTED
 }
 
-enum TransferType {
-  REGULAR
-  DELEGATED #Transfer approved amount by a delegator
+enum EventType {
+  FORCE_CREATE
+  TRNASFER
   MINT
   BURN
   FREEZE
-  THAWED
-  CREATED
-  DESTROYED
-  METADATASET
-  METADATACLEAR
-  CLASSMETADATASET
-  CLASSMETADATACLEAR
-  COLLECTIONMETADATASET
-  COLLECTIONMETADATACLEAR
-  ATTRIBUTESET
-  ATTRIBUTECLEAR
-  TEAMCHANGED
-  OWNERCHANGED
-  ITEM_BOUGHT
-  ITEM_PRICESET
+  THAWE
+  CREATE
+  DESTROY
+  METADATA_SET
+  METADATA_CLEAR
+  ATTRIBUTE_SET
+  ATTRIBUTE_CLEAR
+  TEAM_CHANGE
+  OWNER_CHANGE
+  BOUGHT
+  PRICE_SET
+  PRICE_REMOVED
 }
 
-type Asset @entity {
-  id: ID! # Asset Id
-  name: String
-  symbol: String
-  freezer: String
-  decimal: Int
-  owner: String!
-  admin: String
-  issuer: String
-  creator: String
-  minBalance: BigInt
-  status: AssetStatus!
-  totalSupply: BigInt
-  transfers: [Transfer!] @derivedFrom(field: "asset")
-  assetBalances: [AssetBalance!] @derivedFrom(field: "asset")
-}
-
-type AssetBalance @entity {
-  id: ID! #AccountId-AssetId
-  account: Account!
-  balance: BigInt!
-  status: AssetStatus!
-  asset: Asset!
+enum Direction {
+  FROM
+  TO
 }
 
 type Account @entity {
   id: ID! #Account address
-  wallet: String! @unique
-  balance: BigInt! #Native KSM balance
-  assets: [AssetBalance!] @derivedFrom(field: "account")
   uniqueInstances: [UniqueInstance!] @derivedFrom(field: "owner")
-  historicalBalances: [HistoricalBalance!] @derivedFrom(field: "account")
+  uniqueTransfers: [AccountTransfer!] @derivedFrom(field: "account")
 }
 
-type HistoricalBalance @entity {
+type AccountTransfer @entity {
   id: ID!
+  event: UniqueEvent!
   account: Account!
-  balance: BigInt!
-  timestamp: DateTime!
+  direction: Direction!
 }
 
-interface TransferBase {
-  id: ID! #event id
-  to: String
-  from: String
-  delegator: String
-  fee: BigInt
-  type: TransferType!
-  extrinisicId: String
-  success: Boolean!
-  createdAt: DateTime!
+type UniqueEvent @entity {
+  id: ID! # Event id
+  from: String @index
+  to: String @index # If tranferring / minting
+  price: BigInt @index # If bought
+  uniqueClass: UniqueClass # Class related events
+  uniqueInstance: UniqueInstance # Instance related events
+  type: EventType! @index
+  timestamp: DateTime! @index
   blockHash: String!
-  blockNum: Int!
-}
-
-type Transfer implements TransferBase @entity {
-  id: ID! #event id
-  amount: BigInt
-  to: String
-  from: String
-  delegator: String # Delegator address for transfer by delegator
-  fee: BigInt
-  asset: Asset #If asset is null, then its a regular DOT/KSM transfer
-  type: TransferType!
-  extrinisicId: String
-  success: Boolean!
-  createdAt: DateTime!
-  blockHash: String!
-  blockNum: Int!
-}
-
-type UniqueTransfer implements TransferBase @entity {
-  id: ID! #event id
-  to: String
-  from: String
-  delegator: String # Delegator address for transfer by delegator
-  fee: BigInt
-  uniqueClass: UniqueClass
-  uniqueInstance: UniqueInstance
-  type: TransferType!
-  extrinisicId: String
-  success: Boolean!
-  createdAt: DateTime!
-  blockHash: String!
-  blockNum: Int!
+  blockNum: Int! @index
 }
 
 type UniqueClass @entity {
   id: ID!
-  owner: String
+  owner: String @index
   admin: String
   issuer: String
   creator: String
   freezer: String
-  totalDeposit: BigInt
-  name: String
-  status: AssetStatus!
+  status: Status! @index
   instances: [UniqueInstance!] @derivedFrom(field: "uniqueClass")
-  transfers: [UniqueTransfer!] @derivedFrom(field: "uniqueClass")
+  events: [UniqueEvent!] @derivedFrom(field: "uniqueClass")
   metadata: String
-  attributes: [Attribute!]
+  attributes: [Attribute!]!
 }
 
 type UniqueInstance @entity {
   id: ID!
-  innerID: String!
+  innerID: Int! @index
   uniqueClass: UniqueClass!
   owner: Account!
-  status: AssetStatus!
-  deposit: BigInt
-  transfers: [UniqueTransfer!] @derivedFrom(field: "uniqueInstance")
+  status: Status! @index
+  events: [UniqueEvent!] @derivedFrom(field: "uniqueInstance")
   metadata: String
-  attributes: [Attribute!]
-  price: BigInt!
+  attributes: [Attribute!]!
+  price: BigInt! @index
 }
 
 type Attribute @jsonField {
   key: String
   value: String!
 }
-

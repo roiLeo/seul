@@ -1,8 +1,8 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, OneToMany as OneToMany_} from "typeorm"
 import * as marshal from "./marshal"
-import {AssetStatus} from "./_assetStatus"
+import {Status} from "./_status"
 import {UniqueInstance} from "./uniqueInstance.model"
-import {UniqueTransfer} from "./uniqueTransfer.model"
+import {UniqueEvent} from "./uniqueEvent.model"
 import {Attribute} from "./_attribute"
 
 @Entity_()
@@ -14,6 +14,7 @@ export class UniqueClass {
   @PrimaryColumn_()
   id!: string
 
+  @Index_()
   @Column_("text", {nullable: true})
   owner!: string | undefined | null
 
@@ -29,24 +30,19 @@ export class UniqueClass {
   @Column_("text", {nullable: true})
   freezer!: string | undefined | null
 
-  @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
-  totalDeposit!: bigint | undefined | null
-
-  @Column_("text", {nullable: true})
-  name!: string | undefined | null
-
+  @Index_()
   @Column_("varchar", {length: 9, nullable: false})
-  status!: AssetStatus
+  status!: Status
 
   @OneToMany_(() => UniqueInstance, e => e.uniqueClass)
   instances!: UniqueInstance[]
 
-  @OneToMany_(() => UniqueTransfer, e => e.uniqueClass)
-  transfers!: UniqueTransfer[]
+  @OneToMany_(() => UniqueEvent, e => e.uniqueClass)
+  events!: UniqueEvent[]
 
   @Column_("text", {nullable: true})
   metadata!: string | undefined | null
 
-  @Column_("jsonb", {transformer: {to: obj => obj == null ? undefined : obj.map((val: any) => val.toJSON()), from: obj => obj == null ? undefined : marshal.fromList(obj, val => new Attribute(undefined, marshal.nonNull(val)))}, nullable: true})
-  attributes!: (Attribute)[] | undefined | null
+  @Column_("jsonb", {transformer: {to: obj => obj.map((val: any) => val.toJSON()), from: obj => marshal.fromList(obj, val => new Attribute(undefined, marshal.nonNull(val)))}, nullable: false})
+  attributes!: (Attribute)[]
 }

@@ -1,2 +1,1 @@
-export * from "./assets";
-export * from "./uniques";
+export * from './uniques'
