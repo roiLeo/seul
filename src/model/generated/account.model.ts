@@ -4,16 +4,16 @@ import {AccountTransfer} from "./accountTransfer.model"
 
 @Entity_()
 export class Account {
-  constructor(props?: Partial<Account>) {
-    Object.assign(this, props)
-  }
+    constructor(props?: Partial<Account>) {
+        Object.assign(this, props)
+    }
 
-  @PrimaryColumn_()
-  id!: string
+    @PrimaryColumn_()
+    id!: string
 
-  @OneToMany_(() => UniqueInstance, e => e.owner)
-  uniqueInstances!: UniqueInstance[]
+    @OneToMany_(() => UniqueInstance, e => e.owner)
+    uniqueInstances!: UniqueInstance[]
 
-  @OneToMany_(() => AccountTransfer, e => e.account)
-  uniqueTransfers!: AccountTransfer[]
+    @OneToMany_(() => AccountTransfer, e => e.account)
+    uniqueTransfers!: AccountTransfer[]
 }

@@ -9,13 +9,13 @@ import * as mappings from './mappings'
 const processor = new SubstrateBatchProcessor()
 
 processor.setTypesBundle('statemine')
-processor.setBatchSize(500)
 processor.setDataSource({
   archive: 'https://statemine.archive.subsquid.io/graphql',
   chain: 'wss://statemine-rpc.polkadot.io',
 })
 
-// processor.setBlockRange({from: 338599});		///ERROR AT BLOCK 338600 - no class created before metadataset
+//processor.setBlockRange({from: 3091423, to: 3091423});		///ERROR AT BLOCK 338600 - no class created before metadataset
+//processor.setBlockRange({from: 0, to: 3091423});		///ERROR AT BLOCK 338600 - no class created before metadataset
 
 processor.addEvent('Uniques.Created', {
   data: { event: { args: true } },
@@ -115,6 +115,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
 async function processEventItems(
   ctx: EventHandlerContext<Store, { event: true }>
 ) {
+  //console.log(ctx.event)
   switch (ctx.event.name) {
     case 'Uniques.Created': {
       await mappings.uniqueClassCreated(ctx)
