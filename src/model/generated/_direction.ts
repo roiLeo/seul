@@ -1,4 +1,4 @@
 export enum Direction {
-  FROM = "FROM",
-  TO = "TO",
+    FROM = "FROM",
+    TO = "TO",
 }

@@ -7,49 +7,49 @@ import {Attribute} from "./_attribute"
 
 @Entity_()
 export class UniqueClass {
-  constructor(props?: Partial<UniqueClass>) {
-    Object.assign(this, props)
-  }
+    constructor(props?: Partial<UniqueClass>) {
+        Object.assign(this, props)
+    }
 
-  @PrimaryColumn_()
-  id!: string
+    @PrimaryColumn_()
+    id!: string
 
-  @Index_()
-  @Column_("text", {nullable: true})
-  owner!: string | undefined | null
+    @Index_()
+    @Column_("text", {nullable: true})
+    owner!: string | undefined | null
 
-  @Column_("text", {nullable: true})
-  admin!: string | undefined | null
+    @Column_("text", {nullable: true})
+    admin!: string | undefined | null
 
-  @Column_("text", {nullable: true})
-  issuer!: string | undefined | null
+    @Column_("text", {nullable: true})
+    issuer!: string | undefined | null
 
-  @Column_("text", {nullable: true})
-  creator!: string | undefined | null
+    @Column_("text", {nullable: true})
+    creator!: string | undefined | null
 
-  @Column_("text", {nullable: true})
-  freezer!: string | undefined | null
+    @Column_("text", {nullable: true})
+    freezer!: string | undefined | null
 
-  @Index_()
-  @Column_("varchar", {length: 9, nullable: false})
-  status!: Status
+    @Index_()
+    @Column_("varchar", {length: 9, nullable: false})
+    status!: Status
 
-  @OneToMany_(() => UniqueInstance, e => e.uniqueClass)
-  instances!: UniqueInstance[]
+    @OneToMany_(() => UniqueInstance, e => e.uniqueClass)
+    instances!: UniqueInstance[]
 
-  @OneToMany_(() => UniqueEvent, e => e.uniqueClass)
-  events!: UniqueEvent[]
+    @OneToMany_(() => UniqueEvent, e => e.uniqueClass)
+    events!: UniqueEvent[]
 
-  @Column_("text", {nullable: true})
-  metadata!: string | undefined | null
+    @Column_("text", {nullable: true})
+    metadata!: string | undefined | null
 
-  @Column_("jsonb", {transformer: {to: obj => obj.map((val: any) => val.toJSON()), from: obj => marshal.fromList(obj, val => new Attribute(undefined, marshal.nonNull(val)))}, nullable: false})
-  attributes!: (Attribute)[]
+    @Column_("jsonb", {transformer: {to: obj => obj.map((val: any) => val.toJSON()), from: obj => obj == null ? undefined : marshal.fromList(obj, val => new Attribute(undefined, marshal.nonNull(val)))}, nullable: false})
+    attributes!: (Attribute)[]
 
-  @Column_("int4", {nullable: true})
-  maxSupply!: number | undefined | null
+    @Column_("int4", {nullable: true})
+    maxSupply!: number | undefined | null
 
-  @Index_()
-  @Column_("timestamp with time zone", {nullable: false})
-  createdAt!: Date
+    @Index_()
+    @Column_("timestamp with time zone", {nullable: false})
+    createdAt!: Date
 }
